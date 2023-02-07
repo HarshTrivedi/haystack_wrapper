@@ -132,3 +132,4 @@ dmypy.json
 # project-specific
 serialization_dir
 processed_data
+.DS_Store
