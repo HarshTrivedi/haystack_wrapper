@@ -37,7 +37,7 @@ def main():
     haystack_parser.add_param("dev_filename", type_=str, description="dev_filename", required=True)
     haystack_parser.add_param("max_processes", type_=int, description="max_processes", default=128, required=False)
     haystack_parser.add_param("batch_size", type_=int, description="batch_size", required=True)
-    haystack_parser.add_param("embed_title", action="store_true", description="embed_title", default=False, required=False)
+    haystack_parser.add_param("embed_title", type_=bool, description="embed_title", default=True, required=False)
     haystack_parser.add_param("num_hard_negatives", type_=int, description="num_hard_negatives", default=1, required=False)
     haystack_parser.add_param("num_positives", type_=int, description="num_positives", default=1, required=False)
     haystack_parser.add_param("n_epochs", type_=int, description="n_epochs", required=True)
