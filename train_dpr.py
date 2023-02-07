@@ -25,27 +25,29 @@ def main():
 
     haystack_parser = DictionaryParser(description="Haystack DPR trainer parser.")
     haystack_parser.add_param(
-        "query_model", type=str, help="query_model", default="facebook/dpr-question_encoder-single-nq-base"
+        "query_model", type_=str, description="query_model",
+        default="facebook/dpr-question_encoder-single-nq-base", required=False
     )
     haystack_parser.add_param(
-        "passage_model", type=str, help="passage_model", default="facebook/dpr-ctx_encoder-single-nq-base"
+        "passage_model", type_=str, description="passage_model",
+        default="facebook/dpr-ctx_encoder-single-nq-base", required=False
     )
-    haystack_parser.add_param("data_dir", type=str, help="data_dir")
-    haystack_parser.add_param("train_filename", type=str, help="train_filename")
-    haystack_parser.add_param("dev_filename", type=str, help="dev_filename")
-    haystack_parser.add_param("max_processes", type=int, help="max_processes", default=128)
-    haystack_parser.add_param("batch_size", type=int, help="batch_size")
-    haystack_parser.add_param("embed_title", action="store_true", help="embed_title", default=False)
-    haystack_parser.add_param("num_hard_negatives", type=int, help="num_hard_negatives", default=1)
-    haystack_parser.add_param("num_positives", type=int, help="num_positives", default=1)
-    haystack_parser.add_param("n_epochs", type=int, help="n_epochs")
-    haystack_parser.add_param("evaluate_every", type=int, help="evaluate_every")
-    haystack_parser.add_param("learning_rate", type=int, help="learning_rate")
-    haystack_parser.add_param("num_warmup_steps", type=int, help="num_warmup_steps")
-    haystack_parser.add_param("grad_acc_steps", type=int, help="grad_acc_steps")
-    haystack_parser.add_param("optimizer_name", type=int, help="optimizer_name", default="AdamW")
-    haystack_parser.add_param("checkpoint_every", type=int, help="checkpoint_every")
-    haystack_parser.add_param("checkpoints_to_keep", type=int, help="checkpoints_to_keep")
+    haystack_parser.add_param("data_dir", type_=str, description="data_dir", required=True)
+    haystack_parser.add_param("train_filename", type_=str, description="train_filename", required=True)
+    haystack_parser.add_param("dev_filename", type_=str, description="dev_filename", required=True)
+    haystack_parser.add_param("max_processes", type_=int, description="max_processes", default=128, required=False)
+    haystack_parser.add_param("batch_size", type_=int, description="batch_size", required=True)
+    haystack_parser.add_param("embed_title", action="store_true", description="embed_title", default=False, required=False)
+    haystack_parser.add_param("num_hard_negatives", type_=int, description="num_hard_negatives", default=1, required=False)
+    haystack_parser.add_param("num_positives", type_=int, description="num_positives", default=1, required=False)
+    haystack_parser.add_param("n_epochs", type_=int, description="n_epochs", required=True)
+    haystack_parser.add_param("evaluate_every", type_=int, description="evaluate_every", required=True)
+    haystack_parser.add_param("learning_rate", type_=int, description="learning_rate", required=True)
+    haystack_parser.add_param("num_warmup_steps", type_=int, description="num_warmup_steps", required=True)
+    haystack_parser.add_param("grad_acc_steps", type_=int, description="grad_acc_steps", required=True)
+    haystack_parser.add_param("optimizer_name", type_=int, description="optimizer_name", default="AdamW", required=False)
+    haystack_parser.add_param("checkpoint_every", type_=int, description="checkpoint_every", required=True)
+    haystack_parser.add_param("checkpoints_to_keep", type_=int, description="checkpoints_to_keep", required=True)
 
     if allennlp_args.experiment_name == "haystack_help":
         haystack_parser.print_help()
