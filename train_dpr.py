@@ -1,8 +1,10 @@
 import os
 import json
 import logging
-import argparse
+import dataclasses
 from pathlib import Path
+from typing import Tuple, NewType, Any
+import argparse
 
 import _jsonnet
 from haystack.nodes import DensePassageRetriever
@@ -11,6 +13,24 @@ from haystack.document_stores import InMemoryDocumentStore, MilvusDocumentStore
 
 logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level=logging.WARNING)
 logging.getLogger("haystack").setLevel(logging.INFO)
+
+
+DataClass = NewType("DataClass", Any)
+
+
+class ExtendedArgumentParser(argparse.ArgumentParser):
+    def parse_dict(self, args: dict) -> Tuple[DataClass, ...]:
+        """
+        Alternative helper method that does not use `argparse` at all, instead uses a dict and populating the dataclass
+        types.
+        """
+        outputs = []
+        for dtype in self.dataclass_types:
+            keys = {f.name for f in dataclasses.fields(dtype)}
+            inputs = {k: v for k, v in args.items() if k in keys}
+            obj = dtype(**inputs)
+            outputs.append(obj)
+        return (*outputs,)
 
 
 def main():
@@ -22,7 +42,7 @@ def main():
     )
     allennlp_args = allennlp_parser.parse_args()
 
-    haystack_parser = argparse.ArgumentParser(description="Haystack DPR trainer parser.")
+    haystack_parser = ExtendedArgumentParser(description="Haystack DPR trainer parser.")
     haystack_parser.add_argument("experiment_name", type=str, help="experiment_name")
     haystack_parser.add_argument(
         "--query_model", type=str, help="query_model", default="facebook/dpr-question_encoder-single-nq-base"
@@ -57,7 +77,7 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
-    haystack_args = haystack_parser.parse_dict(args=experiment_config)
+    haystack_args = argparse.parse_dict(args=experiment_config)
 
     retriever = DensePassageRetriever(
         document_store=MilvusDocumentStore(),
