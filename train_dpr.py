@@ -3,7 +3,8 @@ import json
 import logging
 import dataclasses
 from pathlib import Path
-from typing import Tuple, NewType, Any
+from enum import Enum
+from typing import Tuple, Union, Iterable, NewType, Any, List, Optional
 import argparse
 
 import _jsonnet
@@ -16,9 +17,93 @@ logging.getLogger("haystack").setLevel(logging.INFO)
 
 
 DataClass = NewType("DataClass", Any)
+DataClassType = NewType("DataClassType", Any)
 
 
 class ExtendedArgumentParser(argparse.ArgumentParser):
+    # Taken from HF code: https://huggingface.co/transformers/v4.2.2/_modules/transformers/hf_argparser.html
+    """
+    This subclass of `argparse.ArgumentParser` uses type hints on dataclasses to generate arguments.
+
+    The class is designed to play well with the native argparse. In particular, you can add more (non-dataclass backed)
+    arguments to the parser after initialization and you'll get the output back after parsing as an additional
+    namespace.
+    """
+
+    dataclass_types: Iterable[DataClassType]
+
+    def __init__(self, dataclass_types: Union[DataClassType, Iterable[DataClassType]], **kwargs):
+        """
+        Args:
+            dataclass_types:
+                Dataclass type, or list of dataclass types for which we will "fill" instances with the parsed args.
+            kwargs:
+                (Optional) Passed to `argparse.ArgumentParser()` in the regular way.
+        """
+        super().__init__(**kwargs)
+        if dataclasses.is_dataclass(dataclass_types):
+            dataclass_types = [dataclass_types]
+        self.dataclass_types = dataclass_types
+        for dtype in self.dataclass_types:
+            self._add_dataclass_arguments(dtype)
+
+    def _add_dataclass_arguments(self, dtype: DataClassType):
+        for field in dataclasses.fields(dtype):
+            if not field.init:
+                continue
+            field_name = f"--{field.name}"
+            kwargs = field.metadata.copy()
+            # field.metadata is not used at all by Data Classes,
+            # it is provided as a third-party extension mechanism.
+            if isinstance(field.type, str):
+                raise ImportError(
+                    "This implementation is not compatible with Postponed Evaluation of Annotations (PEP 563),"
+                    "which can be opted in from Python 3.7 with `from __future__ import annotations`."
+                    "We will add compatibility when Python 3.9 is released."
+                )
+            typestring = str(field.type)
+            for prim_type in (int, float, str):
+                for collection in (List,):
+                    if (
+                        typestring == f"typing.Union[{collection[prim_type]}, NoneType]"
+                        or typestring == f"typing.Optional[{collection[prim_type]}]"
+                    ):
+                        field.type = collection[prim_type]
+                if (
+                    typestring == f"typing.Union[{prim_type.__name__}, NoneType]"
+                    or typestring == f"typing.Optional[{prim_type.__name__}]"
+                ):
+                    field.type = prim_type
+
+            if isinstance(field.type, type) and issubclass(field.type, Enum):
+                kwargs["choices"] = list(field.type)
+                kwargs["type"] = field.type
+                if field.default is not dataclasses.MISSING:
+                    kwargs["default"] = field.default
+            elif field.type is bool or field.type is Optional[bool]:
+                if field.type is bool or (field.default is not None and field.default is not dataclasses.MISSING):
+                    kwargs["action"] = "store_false" if field.default is True else "store_true"
+                if field.default is True:
+                    field_name = f"--no_{field.name}"
+                    kwargs["dest"] = field.name
+            elif hasattr(field.type, "__origin__") and issubclass(field.type.__origin__, List):
+                kwargs["nargs"] = "+"
+                kwargs["type"] = field.type.__args__[0]
+                assert all(
+                    x == kwargs["type"] for x in field.type.__args__
+                ), "{} cannot be a List of mixed types".format(field.name)
+                if field.default_factory is not dataclasses.MISSING:
+                    kwargs["default"] = field.default_factory()
+            else:
+                kwargs["type"] = field.type
+                if field.default is not dataclasses.MISSING:
+                    kwargs["default"] = field.default
+                elif field.default_factory is not dataclasses.MISSING:
+                    kwargs["default"] = field.default_factory()
+                else:
+                    kwargs["required"] = True
+            self.add_argument(field_name, **kwargs)
+
     def parse_dict(self, args: dict) -> Tuple[DataClass, ...]:
         """
         Alternative helper method that does not use `argparse` at all, instead uses a dict and populating the dataclass
@@ -31,6 +116,7 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
             obj = dtype(**inputs)
             outputs.append(obj)
         return (*outputs,)
+
 
 
 def main():
