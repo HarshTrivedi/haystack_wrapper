@@ -59,7 +59,7 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
-    haystack_args = haystack_parser.parse_dict(args=experiment_config)
+    haystack_args = haystack_parser.parse_dict(experiment_config)
 
     retriever = DensePassageRetriever(
         document_store=MilvusDocumentStore(),
