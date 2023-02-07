@@ -135,3 +135,4 @@ processed_data
 .DS_Store
 docker-compose.yml
 volumes
+.project-milvus-config.json
