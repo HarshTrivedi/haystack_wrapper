@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import dataclasses
+from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
 from typing import Tuple, Union, Iterable, NewType, Any, List, Optional
@@ -18,6 +19,11 @@ logging.getLogger("haystack").setLevel(logging.INFO)
 
 DataClass = NewType("DataClass", Any)
 DataClassType = NewType("DataClassType", Any)
+
+
+@dataclass
+class EmptyArgs:
+    pass
 
 
 class ExtendedArgumentParser(argparse.ArgumentParser):
@@ -128,7 +134,7 @@ def main():
     )
     allennlp_args = allennlp_parser.parse_args()
 
-    haystack_parser = ExtendedArgumentParser(description="Haystack DPR trainer parser.")
+    haystack_parser = ExtendedArgumentParser(EmptyArgs, description="Haystack DPR trainer parser.")
     haystack_parser.add_argument("experiment_name", type=str, help="experiment_name")
     haystack_parser.add_argument(
         "--query_model", type=str, help="query_model", default="facebook/dpr-question_encoder-single-nq-base"
