@@ -8,6 +8,7 @@ import _jsonnet
 from dictparse import DictionaryParser
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import InMemoryDocumentStore, MilvusDocumentStore
+from haystack.utils.doc_store import launch_milvus
 
 
 logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level=logging.WARNING)
@@ -60,6 +61,10 @@ def main():
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
     haystack_args = haystack_parser.parse_dict(experiment_config)
+
+    print("Attempting to launch milvus via docker ...")
+    launch_milvus()
+    print("... Exited launch_milvus function.")
 
     retriever = DensePassageRetriever(
         document_store=MilvusDocumentStore(),
