@@ -3,7 +3,7 @@ import json
 import argparse
 
 import _jsonnet
-from lib import read_jsonl
+from lib import read_json
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
@@ -46,7 +46,7 @@ def main():
     print(json.dumps(collection_name_to_sizes, indent=4))
 
     print("Reading input documents.")
-    documents = read_jsonl(allennlp_args.data_file_path)
+    documents = read_json(allennlp_args.data_file_path)
     num_documents = len(documents)
     print(f"Number of input documents: {num_documents}")
 

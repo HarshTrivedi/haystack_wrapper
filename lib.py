@@ -1,6 +1,12 @@
 import os
 import json
-from typing import Dict, List
+from typing import Dict, List, Union
+
+
+def read_json(file_path: str) -> Union[List, Dict]:
+    with open(file_path, "r") as file:
+        data = json.load(file)
+    return data
 
 
 def read_jsonl(file_path: str) -> List[Dict]:
