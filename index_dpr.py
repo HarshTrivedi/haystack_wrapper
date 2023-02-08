@@ -6,7 +6,7 @@ import _jsonnet
 from lib import read_jsonl
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
-from pymilvus import list_collections, Collection
+from pymilvus import list_collections, connections, Collection
 
 
 def main():
@@ -35,6 +35,8 @@ def main():
 
     # TODO: Shift this to a command show_stats.
     print("Milvus indexes and their sizes: ")
+    connections.add_connection(default={"host": "localhost", "port": "19530"})
+    connections.connect()
     collection_names = list_collections()
     collection_name_to_sizes = {}
     for collection_name in collection_names:
