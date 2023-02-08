@@ -6,8 +6,7 @@ import _jsonnet
 from lib import read_jsonl
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
-from pymilvus.utility import list_collections
-from pymilvus import Collection
+from pymilvus import list_collections, Collection
 
 
 def main():
