@@ -68,7 +68,9 @@ def main():
     data_file_name = os.path.splitext(os.path.basename(allennlp_args.data_file_path))[0]
     retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
     os.makedirs(retrieval_results_dir, exist_ok=True)
-    output_file_path = os.path.join(retrieval_results_dir, data_file_name + ".jsonl")
+    output_file_path = os.path.join(
+        retrieval_results_dir, "___".join(allennlp_args.index_name, data_file_name) + ".jsonl"
+    )
     write_jsonl(prediction_instances, output_file_path)
 
 
