@@ -22,6 +22,7 @@ def main():
     )
     allennlp_parser.add_argument("index_name", type=str, help="index_name", choices=list_collections())
     allennlp_parser.add_argument("prediction_file_path", type=str, help="prediction file path")
+    allennlp_parser.add_argument("--num_documents", type=int, help="num_documents", default=20)
     allennlp_parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
     allennlp_parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
     allennlp_args = allennlp_parser.parse_args()
