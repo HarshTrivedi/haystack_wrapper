@@ -6,11 +6,14 @@ import _jsonnet
 from lib import read_jsonl, write_jsonl
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
-from pymilvus import list_collections
+from pymilvus import list_collections, connections
 
 
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
+
+    connections.add_connection(default={"host": "localhost", "port": "19530"})
+    connections.connect()
 
     allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around HF transformers.")
     allennlp_parser.add_argument(
