@@ -40,7 +40,7 @@ def main():
     collection_names = list_collections()
     collection_name_to_sizes = {}
     for collection_name in collection_names:
-        collection = Collection(name=index_name)
+        collection = Collection(name=collection_name)
         collection.load()
         collection_name_to_sizes[collection_name] = collection.num_entities
     print(json.dumps(collection_name_to_sizes, indent=4))
