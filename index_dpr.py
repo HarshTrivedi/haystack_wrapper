@@ -51,7 +51,7 @@ def main():
     print(f"Number of input documents: {num_documents}")
 
     print("Writing documents in MilvusDocumentStore.")
-    index_name = "___".join(allennlp_args.experiment_name, data_file_name)
+    index_name = "___".join([allennlp_args.experiment_name, data_file_name])
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
