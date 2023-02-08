@@ -1,11 +1,13 @@
 import os
 import json
+import shutil
 import logging
 from pathlib import Path
 import argparse
 
 import _jsonnet
 from dictparse import DictionaryParser
+from lib import is_directory_empty
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import InMemoryDocumentStore
 
@@ -21,6 +23,7 @@ def main():
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
+    allennlp_parser.add_argument("--force", action="store_true", default=False, help="force")
     allennlp_args = allennlp_parser.parse_args()
 
     haystack_parser = DictionaryParser(description="Haystack DPR trainer parser.")
@@ -70,8 +73,15 @@ def main():
         max_seq_len_query=60,
         max_seq_len_passage=440,
     )
-    
+
     serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
+    if not is_directory_empty(serialization_dir) and not allennlp_args.force:
+        exit(
+            f"The directory {serialization_dir} is not empty. "
+            f"Pass --force to force delete it before training."
+        )
+
+    shutil.rmtree(serialization_dir, ignore_errors=True)
     os.makedirs(serialization_dir, exist_ok=True)
 
     checkpoint_dir = os.path.join(serialization_dir, "model_checkpoints")

@@ -14,3 +14,8 @@ def write_jsonl(instances: List[Dict], file_path: str):
     with open(file_path, "w") as file:
         for instance in instances:
             file.write(json.dumps(instance)+"\n")
+
+def is_directory_empty(directory: str) -> bool:
+    if not os.path.exists(directory):
+        return True
+    return not os.listdir(directory)
