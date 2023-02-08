@@ -65,8 +65,8 @@ def main():
     print("Loading DPR retriever models.")
     retriever = DensePassageRetriever.load(
         load_dir=serialization_dir, # No need to pass document_store here, pass at retrieval time.
-        query_embedding_model=os.path.join(serialization_dir, "query_encoder"),
-        passage_embedding_model=os.path.join(serialization_dir, "passage_encoder"),
+        query_encoder_dir=os.path.join(serialization_dir, "query_encoder"),
+        passage_encoder_dir=os.path.join(serialization_dir, "passage_encoder"),
         max_seq_len_query=60,
         max_seq_len_passage=440,
     )
