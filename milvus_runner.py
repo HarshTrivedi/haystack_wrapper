@@ -44,13 +44,13 @@ def main():
     if not args.no_password:
         print(command)
         password = input("enter sudo password:")
+        command = command.replace("<password>", password)
     else:
         command = command.replace(
             f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S",
             f"DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo"
         )
         print(command)
-        command = command.replace("<password>", password)
 
     subprocess.call(command, shell=True)
 
