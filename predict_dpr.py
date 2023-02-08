@@ -37,13 +37,13 @@ def main():
 
     index_type = experiment_config.pop("index_type")
     document_store = MilvusDocumentStore(index=allennlp_args.index_name)
-    assert not document_store.collection.is_empty() # might be a different method, check.
-    assert document_store.collection.index_type == index_type
+    assert not document_store.collection.is_empty
+    assert document_store.index_type == index_type
 
     retriever = DensePassageRetriever.load(
-        load_dir=serialization_dir, # No need to pass document_store here, pass at retrieval time.
-        query_embedding_model=os.path.join(serialization_dir, "query_encoder"),
-        passage_embedding_model=os.path.join(serialization_dir, "passage_encoder"),
+        load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
+        query_encoder_dir="query_encoder",
+        passage_encoder_dir="passage_encoder",
         max_seq_len_query=60,
         max_seq_len_passage=440,
     )
