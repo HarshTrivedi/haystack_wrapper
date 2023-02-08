@@ -2,7 +2,7 @@ import os
 import argparse
 import subprocess
 
-from lib import get_milvus_configs()
+from lib import get_milvus_configs
 
 
 def main():
