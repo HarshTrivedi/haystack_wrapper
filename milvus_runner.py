@@ -27,9 +27,6 @@ def main():
         print("Downloading docker-compose.yml")
         subprocess.call(command, shell=True)
 
-    if not args.no_password:
-        password = input("enter sudo password:")
-
     if args.command == "start":
         command = f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S docker-compose up -d"
     elif args.command == "stop":
