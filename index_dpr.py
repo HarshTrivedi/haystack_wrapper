@@ -1,6 +1,7 @@
 import os
 import json
 import argparse
+import time
 
 import _jsonnet
 from lib import read_jsonl
@@ -84,7 +85,7 @@ def main():
         document_store.update_embeddings(
             retriever, batch_size=10_000, update_existing_embeddings=True,
         )
-
+        time.sleep(2) # needs some time to update num_entites
         number_of_documents = document_store.collection.num_entities
         print(f"Number of indexed documents: {number_of_documents}")
 
