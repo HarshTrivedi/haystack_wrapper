@@ -45,40 +45,48 @@ def main():
         collection_name_to_sizes[collection_name] = collection.num_entities
     print(json.dumps(collection_name_to_sizes, indent=4))
 
-    print("Reading input documents.")
-    documents = read_jsonl(allennlp_args.data_file_path)
-    num_documents = len(documents)
-    print(f"Number of input documents: {num_documents}")
-
-    print("Writing documents in MilvusDocumentStore.")
+    print("Building MilvusDocumentStore.")
     index_name = "___".join([allennlp_args.experiment_name, data_file_name])
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
         index=index_name, index_type=index_type, embedding_dim=768, id_field="id", embedding_field="embedding"
     )
-    document_store.write_documents(documents)
-    # NOTE: I can iterate over the documents using get_all_documents_generator or get_all_documents functions.
 
-    serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
+    if allennlp_args.command == "delete":
+        document_store.delete_index(index_name)
 
-    print("Loading DPR retriever models.")
-    retriever = DensePassageRetriever.load(
-        load_dir=serialization_dir, document_store=None, # No need to pass document_store here, pass at retrieval time.
-        query_encoder_dir="query_encoder",
-        passage_encoder_dir="passage_encoder",
-        max_seq_len_query=60,
-        max_seq_len_passage=440,
-    )
+    if allennlp_args.command == "create":
 
-    print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
-    # The data will be stored in milvus server (just like es).
-    document_store.update_embeddings(
-        retriever, batch_size=10_000, update_existing_embeddings=True,
-    )
+        print("Reading input documents.")
+        documents = read_jsonl(allennlp_args.data_file_path)
+        num_documents = len(documents)
+        print(f"Number of input documents: {num_documents}")
 
-    number_of_documents = document_store.collection.num_entities
-    print(f"Number of indexed documents: {number_of_documents}")
+
+        print("Writing documents in MilvusDocumentStore.")
+        document_store.write_documents(documents)
+        # NOTE: I can iterate over the documents using get_all_documents_generator or get_all_documents functions.
+
+        serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
+
+        print("Loading DPR retriever models.")
+        retriever = DensePassageRetriever.load(
+            load_dir=serialization_dir, document_store=None, # No need to pass document_store here, pass at retrieval time.
+            query_encoder_dir="query_encoder",
+            passage_encoder_dir="passage_encoder",
+            max_seq_len_query=60,
+            max_seq_len_passage=440,
+        )
+
+        print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
+        # The data will be stored in milvus server (just like es).
+        document_store.update_embeddings(
+            retriever, batch_size=10_000, update_existing_embeddings=True,
+        )
+
+        number_of_documents = document_store.collection.num_entities
+        print(f"Number of indexed documents: {number_of_documents}")
 
 
 if __name__ == "__main__":
