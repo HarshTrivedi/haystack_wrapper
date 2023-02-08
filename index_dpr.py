@@ -3,9 +3,11 @@ import json
 import argparse
 
 import _jsonnet
+from lib import read_jsonl
 from haystack.nodes import DensePassageRetriever
-from haystack.document_stores import InMemoryDocumentStore, MilvusDocumentStore
+from haystack.document_stores import MilvusDocumentStore
 from pymilvus.utility import list_collections
+from pymilvus import Collection
 
 
 def main():
@@ -26,7 +28,7 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
-    data_file_name = os.path.splitext(os.path.basename(args.data_file_path))[0]
+    data_file_name = os.path.splitext(os.path.basename(allennlp_args.data_file_path))[0]
     index_dir = os.path.join(
         "serialization_dir", allennlp_args.experiment_name, "indexes", data_file_name
     )
@@ -48,7 +50,7 @@ def main():
     print(f"Number of input documents: {num_documents}")
 
     print("Writing documents in MilvusDocumentStore.")
-    index_name = "___".join(args.experiment_name, data_file_name)
+    index_name = "___".join(allennlp_args.experiment_name, data_file_name)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
@@ -56,6 +58,8 @@ def main():
     )
     document_store.write_documents(documents)
     # NOTE: I can iterate over the documents using get_all_documents_generator or get_all_documents functions.
+
+    serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
 
     print("Loading DPR retriever models.")
     retriever = DensePassageRetriever.load(
