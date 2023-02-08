@@ -31,7 +31,7 @@ def main():
         command = f"echo <password> | sudo -S docker-compose ps"
     elif args.command == "delete":
         # all the data is stored here (similar to ES, so don't delete unless really required)
-        volumes_directory = os.path.join(milvus_data_directory, "volumes")
+        volumes_directory = os.path.join(os.environ["DOCKER_VOLUME_DIRECTORY"], "volumes")
         command = f"echo <password> | sudo -S rm -rf {volumes_directory}"
     else:
         exit(f"Unknown command: {args.command}")
