@@ -3,14 +3,9 @@ import json
 import argparse
 import subprocess
 
-from lib import get_milvus_configs
-
 
 def main():
     # Made using https://milvus.io/docs/install_standalone-docker.md
-
-    milvus_config = get_milvus_configs()
-    milvus_data_directory = milvus_config["data_directory"]
 
     parser = argparse.ArgumentParser(description="Milvus runner (start, stop, status).")
     parser.add_argument(
@@ -29,15 +24,15 @@ def main():
         subprocess.call(command, shell=True)
 
     if args.command == "start":
-        command = f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S docker-compose up -d"
+        command = f"echo <password> | sudo -S docker-compose up -d"
     elif args.command == "stop":
-        command = f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S docker-compose down"
+        command = f"echo <password> | sudo -S docker-compose down"
     elif args.command == "status":
-        command = f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S docker-compose ps"
+        command = f"echo <password> | sudo -S docker-compose ps"
     elif args.command == "delete":
         # all the data is stored here (similar to ES, so don't delete unless really required)
         volumes_directory = os.path.join(milvus_data_directory, "volumes")
-        command = f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S rm -rf {volumes_directory}"
+        command = f"echo <password> | sudo -S rm -rf {volumes_directory}"
     else:
         exit(f"Unknown command: {args.command}")
 
@@ -46,10 +41,7 @@ def main():
         password = input("enter sudo password:")
         command = command.replace("<password>", password)
     else:
-        command = command.replace(
-            f"echo <password> | DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo -S",
-            f"DOCKER_VOLUME_DIRECTORY={milvus_data_directory} sudo"
-        )
+        command = command.replace(f"echo <password> | sudo -S", f"sudo")
         print(command)
 
     subprocess.call(command, shell=True)

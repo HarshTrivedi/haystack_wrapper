@@ -3,7 +3,7 @@
 A sample sample experiment:
 
 ```bash
-# Set "data_directory" in .project-milvus-config.json
+# Set "DOCKER_VOLUME_DIRECTORY" in .env
 python train_dpr.py sample_config
 
 python milvus_runner.py start
