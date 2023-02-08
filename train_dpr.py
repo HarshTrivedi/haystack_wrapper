@@ -7,8 +7,7 @@ import argparse
 import _jsonnet
 from dictparse import DictionaryParser
 from haystack.nodes import DensePassageRetriever
-from haystack.document_stores import InMemoryDocumentStore, MilvusDocumentStore
-from haystack.utils.doc_store import launch_milvus
+from haystack.document_stores import InMemoryDocumentStore
 
 
 logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level=logging.WARNING)
@@ -60,14 +59,12 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
+    experiment_config.pop("index_type") # not used here, it's only used at index generation time.
+
     haystack_args = haystack_parser.parse_dict(experiment_config)
 
-    print("Attempting to launch milvus via docker ...")
-    launch_milvus()
-    print("... Exited launch_milvus function.")
-
     retriever = DensePassageRetriever(
-        document_store=MilvusDocumentStore(),
+        document_store=InMemoryDocumentStore(), # NOTE: No need of using Milvus over here.
         query_embedding_model=haystack_args.query_model,
         passage_embedding_model=haystack_args.passage_model,
         max_seq_len_query=60,

@@ -17,4 +17,6 @@
     "evaluate_every": 100,
     "checkpoint_every": 100,
     "checkpoints_to_keep": 5,
+
+    "index_type": "IVF_FLAT",
 }
