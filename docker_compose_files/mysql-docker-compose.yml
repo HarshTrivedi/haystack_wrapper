@@ -1,5 +1,5 @@
 mysql:
-  image: mysql:8.0
+  image: mysql:5.7
   container_name: mysql
   environment:
     MYSQL_DATABASE: 'mysql'
@@ -9,7 +9,6 @@ mysql:
   ports:
     - "3306:3306"
   volumes:
-    - ${MYSQL_DATA_DIRECTORY}/data:/var/lib/mysql
-    - ${MYSQL_DATA_DIRECTORY}/logs:/logs
     - ${MYSQL_DATA_DIRECTORY}/conf.d:/etc/mysql/conf.d
-    - ${MYSQL_DATA_DIRECTORY}/init.sql:/docker-entrypoint-initdb.d/init.sql
+    - ${MYSQL_DATA_DIRECTORY}/logs:/logs
+    - ${MYSQL_DATA_DIRECTORY}/data:/var/lib/mysql
