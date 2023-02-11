@@ -4,9 +4,10 @@ import subprocess
 
 
 def main():
-    # Made using https://milvus.io/docs/install_standalone-docker.md
+    # Made using https://github.com/gaoshanyu/mysql-docker-compose
+    # and https://geshan.com.np/blog/2022/02/mysql-docker-compose/
 
-    parser = argparse.ArgumentParser(description="Milvus runner (start, stop, status).")
+    parser = argparse.ArgumentParser(description="MySQL runner (start, stop, status).")
     parser.add_argument(
         "command", type=str, help="command",
         choices=("start", "stop", "status", "delete")
@@ -26,8 +27,7 @@ def main():
         command = f"echo <password> | sudo -S docker-compose ps"
     elif args.command == "delete":
         # all the data is stored here (similar to ES, so don't delete unless really required)
-        /var/lib/mysql
-        volumes_directory = os.path.join(os.environ["MILVUS_DATA_DIRECTORY"], "volumes")
+        volumes_directory = os.path.join(os.environ["MYSQL_DATA_DIRECTORY"], "data")
         command = f"echo <password> | sudo -S rm -rf {volumes_directory}"
     else:
         exit(f"Unknown command: {args.command}")

@@ -134,4 +134,4 @@ serialization_dir
 processed_data
 .DS_Store
 docker-compose.yml
-volumes
+.history

@@ -1,0 +1,15 @@
+mysql:
+  image: mysql:8.0
+  container_name: mysql
+  environment:
+    MYSQL_DATABASE: 'mysql'
+    MYSQL_USER: 'root'
+    MYSQL_PASSWORD: '12345678'
+    MYSQL_ROOT_PASSWORD: '12345678'
+  ports:
+    - "3306:3306"
+  volumes:
+    - ${MSQL_DATA_DIRECTORY}/data:/var/lib/mysql
+    - ${MSQL_DATA_DIRECTORY}/logs:/logs
+    - ${MSQL_DATA_DIRECTORY}/conf.d:/etc/mysql/conf.d
+    - ${MSQL_DATA_DIRECTORY}/init.sql:/docker-entrypoint-initdb.d/init.sql
