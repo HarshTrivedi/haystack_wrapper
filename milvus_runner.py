@@ -19,11 +19,11 @@ def main():
     assert os.path.exists(docker_compose_file_path)
 
     if args.command == "start":
-        command = f"echo <password> | sudo -S docker-compose up -d"
+        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} up -d"
     elif args.command == "stop":
-        command = f"echo <password> | sudo -S docker-compose down"
+        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} down"
     elif args.command == "status":
-        command = f"echo <password> | sudo -S docker-compose ps"
+        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} ps"
     elif args.command == "delete":
         # all the data is stored here (similar to ES, so don't delete unless really required)
         volumes_directory = os.path.join(os.environ["MILVUS_DATA_DIRECTORY"], "volumes")
