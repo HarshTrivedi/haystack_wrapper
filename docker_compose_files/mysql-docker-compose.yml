@@ -9,7 +9,7 @@ mysql:
   ports:
     - "3306:3306"
   volumes:
-    - ${MSQL_DATA_DIRECTORY}/data:/var/lib/mysql
-    - ${MSQL_DATA_DIRECTORY}/logs:/logs
-    - ${MSQL_DATA_DIRECTORY}/conf.d:/etc/mysql/conf.d
-    - ${MSQL_DATA_DIRECTORY}/init.sql:/docker-entrypoint-initdb.d/init.sql
+    - ${MYSQL_DATA_DIRECTORY}/data:/var/lib/mysql
+    - ${MYSQL_DATA_DIRECTORY}/logs:/logs
+    - ${MYSQL_DATA_DIRECTORY}/conf.d:/etc/mysql/conf.d
+    - ${MYSQL_DATA_DIRECTORY}/init.sql:/docker-entrypoint-initdb.d/init.sql
