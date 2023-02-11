@@ -26,7 +26,6 @@ def main():
         command = f"echo <password> | sudo -S docker-compose ps"
     elif args.command == "delete":
         # all the data is stored here (similar to ES, so don't delete unless really required)
-        /var/lib/mysql
         volumes_directory = os.path.join(os.environ["MILVUS_DATA_DIRECTORY"], "volumes")
         command = f"echo <password> | sudo -S rm -rf {volumes_directory}"
     else:

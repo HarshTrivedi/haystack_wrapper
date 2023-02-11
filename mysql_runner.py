@@ -15,7 +15,7 @@ def main():
     parser.add_argument("--no_password", action="store_true", help="no_password")
     args = parser.parse_args()
 
-    docker_compose_file_path = os.path.join("docker_compose_files", "milvus-docker-compose.yml")
+    docker_compose_file_path = os.path.join("docker_compose_files", "mysql-docker-compose.yml")
 
     assert os.path.exists(docker_compose_file_path)
 
