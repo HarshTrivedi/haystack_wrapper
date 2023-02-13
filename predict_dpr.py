@@ -66,8 +66,12 @@ def main():
     for prediction_instance, retrieved_documents in zip(prediction_instances, retrieval_results):
         retrieved_documents_stripped = []
         for retrieved_document in retrieved_documents:
-            retrieved_document_stripped = retrieved_document.meta
-            retrieved_document_stripped["score"] = retrieved_document.score
+            retrieved_document_ = retrieved_document.to_dict()
+            # it has other potentially useful details, but not needed for now.
+            retrieved_document_stripped = {
+                "content": retrieved_document_["content"],
+                "score": retrieved_document_["score"],
+            }
             retrieved_documents_stripped.append(retrieved_document_stripped)
         prediction_instance["retrieved_documents"] = retrieved_documents_stripped
 
