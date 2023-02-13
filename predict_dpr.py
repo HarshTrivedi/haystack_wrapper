@@ -37,7 +37,10 @@ def main():
     serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
 
     index_type = experiment_config.pop("index_type")
-    document_store = MilvusDocumentStore(index=allennlp_args.index_name)
+    document_store = MilvusDocumentStore(
+        sql_url="postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+        index=allennlp_args.index_name
+    )
     assert not document_store.collection.is_empty
     assert document_store.index_type == index_type
 

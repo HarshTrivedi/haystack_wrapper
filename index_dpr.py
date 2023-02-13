@@ -51,7 +51,9 @@ def main():
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
-        index=index_name, index_type=index_type, embedding_dim=768, id_field="id", embedding_field="embedding"
+        sql_url="postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+        index=index_name, index_type=index_type,
+        embedding_dim=768, id_field="id", embedding_field="embedding"
     )
 
     if allennlp_args.command == "delete":
