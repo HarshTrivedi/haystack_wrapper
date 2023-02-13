@@ -5,6 +5,8 @@ import subprocess
 
 def main():
     # Made using https://milvus.io/docs/install_standalone-docker.md
+    # DB Connection string for mysql: "mysql://root:12345678@127.0.0.1/mysql" (facing issues)
+    # DB Connection string for postgresql: "postgresql://postgres:postgres@127.0.0.1:5432/postgres" (works)
 
     parser = argparse.ArgumentParser(description="Milvus runner (start, stop, status).")
     parser.add_argument(
