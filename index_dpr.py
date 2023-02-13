@@ -86,7 +86,7 @@ def main():
             retriever, batch_size=10_000, update_existing_embeddings=True,
         )
         time.sleep(2) # needs some time to update num_entites
-        number_of_documents = document_store.collection.num_entities
+        number_of_documents = document_store.get_embedding_count()
         print(f"Number of indexed documents: {number_of_documents}")
 
 
