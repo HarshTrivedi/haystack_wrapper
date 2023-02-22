@@ -75,8 +75,6 @@ beaker session create \
 
     if args.command == "stop":
         assert args.force, "--force is meaningless for stop command."
-        # This is usually not needed. Run it only if you get an error message saying
-        # the ports are in use or something.
         command = (
             "docker rm -f postgres -f milvus-standalone -f milvus-minio -f milvus-etcd"
         )
