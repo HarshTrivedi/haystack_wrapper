@@ -12,6 +12,7 @@ def main():
         choices=("start", "stop", "status", "delete")
     )
     parser.add_argument("--no_password", action="store_true", help="no_password")
+    parser.add_argument("--expose", action="store_true", help="expose server host and port to the internet.")
     args = parser.parse_args()
 
     docker_compose_file_path = os.path.join("docker_compose_files", "postgresql-docker-compose.yml")
@@ -40,6 +41,10 @@ def main():
         print(command)
 
     subprocess.call(command, shell=True)
+
+    if args.expose:
+        command = "bore local 5432 --to bore.pub"
+        subprocess.call(command, shell=True)
 
 
 if __name__ == "__main__":
