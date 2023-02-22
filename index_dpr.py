@@ -41,7 +41,9 @@ def main():
     milvus_host, milvus_port = milvus_address.split(":")
     # TODO: Shift this to a command show_stats.
     print("Milvus indexes and their sizes: ")
-    milvus_host = milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
+    milvus_host = (
+        milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
+    )
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
     collection_names = list_collections()
@@ -57,6 +59,9 @@ def main():
     postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
     assert ":" in postgresql_address, "The address must have ':' in it."
     postgresql_host, postgresql_port = postgresql_address.split(":")
+    postgresql_host = (
+        postgresql_host.split("//")[1] if "//" in postgresql_host else postgresql_host # it shouldn't have http://
+    )
 
     index_name = "___".join([allennlp_args.experiment_name, data_file_name])
     index_type = experiment_config.pop("index_type")
