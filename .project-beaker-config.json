@@ -1,0 +1,7 @@
+{
+    "user_name": "harsh-trivedi",
+    "project_name": "default",
+    "working_dir": "/run",
+    "image_critical_paths": [],
+    "beaker_workspace": "harsh-trivedi/default"
+}
