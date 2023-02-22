@@ -8,4 +8,5 @@ COPY docker_compose_files/ docker_compose_files/
 RUN pip install 'farm-haystack[milvus]'
 RUN pip install 'farm-haystack[milvus2]'
 
-ENTRYPOINT ["python", "milvus_runner.py", "start"]
+# ENTRYPOINT ["python", "milvus_runner.py", "start"]
+ENTRYPOINT []
