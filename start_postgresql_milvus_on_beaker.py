@@ -3,8 +3,6 @@ import json
 import argparse
 import subprocess
 
-from beakerizer.utils import user_name, beaker_workspace
-
 
 image_name = "natcq_postgresql_milvus"
 
