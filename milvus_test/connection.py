@@ -1,14 +1,14 @@
+import os
+from dotenv import load_dotenv
 
 
 def test_postgresql_connection():
 
     from sqlalchemy import create_engine
 
-    # postgresql_host = "localhost"
-    # postgresql_port = "5432"
-
-    postgresql_host = "bore.pub"
-    postgresql_port = "39549"
+    # Note the address shouldn't have http://
+    # Note the default psql port is 5432 but I changed it to 8432 to avoid conflict on beaker.
+    postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:5432").split(":")
 
     try:
         engine = create_engine(f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres")
@@ -22,11 +22,8 @@ def test_milvus_connection():
 
     from pymilvus import connections
 
-    #milvus_host = "localhost"
-    #milvus_port = "19530"
-
-    milvus_host = "bore.pub"
-    milvus_port = "39863"
+    # Note the address shouldn't have http://
+    milvus_host, milvus_port = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530").split(":")
 
     try:
         connections.add_connection(default={"host": milvus_host, "port": milvus_port})
@@ -37,6 +34,7 @@ def test_milvus_connection():
 
 
 def main():
+    load_dotenv()
     test_postgresql_connection()
     test_milvus_connection()
 
