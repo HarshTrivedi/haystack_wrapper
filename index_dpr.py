@@ -78,7 +78,6 @@ def main():
         num_documents = len(documents)
         print(f"Number of input documents: {num_documents}")
 
-
         print("Writing documents in MilvusDocumentStore.")
         document_store.write_documents(documents)
         # NOTE: I can iterate over the documents using get_all_documents_generator or get_all_documents functions.
