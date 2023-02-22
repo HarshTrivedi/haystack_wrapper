@@ -5,6 +5,7 @@ import time
 
 import _jsonnet
 from lib import read_jsonl
+from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
@@ -21,6 +22,7 @@ def main():
     )
     allennlp_parser.add_argument("data_file_path", type=str, help="data file path")
     allennlp_args = allennlp_parser.parse_args()
+    load_dotenv()
 
     experiment_config_file_path = os.path.join("experiment_configs", allennlp_args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):
@@ -34,9 +36,12 @@ def main():
     )
     os.makedirs(index_dir, exist_ok=True)
 
+    milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
+    assert ":" in milvus_address, "The address must have ':' in it."
+    milvus_host, milvus_port = milvus_address.split(":")
     # TODO: Shift this to a command show_stats.
     print("Milvus indexes and their sizes: ")
-    connections.add_connection(default={"host": "localhost", "port": "19530"})
+    connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
     collection_names = list_collections()
     collection_name_to_sizes = {}
@@ -47,11 +52,16 @@ def main():
     print(json.dumps(collection_name_to_sizes, indent=4))
 
     print("Building MilvusDocumentStore.")
+
+    postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
+    assert ":" in postgresql_address, "The address must have ':' in it."
+    postgresql_host, postgresql_port = postgresql_address.split(":")
+
     index_name = "___".join([allennlp_args.experiment_name, data_file_name])
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
-        sql_url="postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+        sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         index=index_name, index_type=index_type,
         embedding_dim=768, id_field="id", embedding_field="embedding"
     )

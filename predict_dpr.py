@@ -4,6 +4,7 @@ import argparse
 
 import _jsonnet
 from lib import read_jsonl, write_jsonl
+from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections
@@ -11,9 +12,6 @@ from pymilvus import list_collections, connections
 
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
-
-    connections.add_connection(default={"host": "localhost", "port": "19530"})
-    connections.connect()
 
     allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around HF transformers.")
     allennlp_parser.add_argument(
@@ -26,6 +24,14 @@ def main():
     allennlp_parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
     allennlp_parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
     allennlp_args = allennlp_parser.parse_args()
+    load_dotenv()
+
+    milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
+    assert ":" in milvus_address, "The address must have ':' in it."
+    milvus_host, milvus_port = milvus_address.split(":")
+
+    connections.add_connection(default={"host": milvus_host, "port": milvus_port})
+    connections.connect()
 
     experiment_config_file_path = os.path.join("experiment_configs", allennlp_args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):
@@ -36,9 +42,13 @@ def main():
 
     serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
 
+    postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
+    assert ":" in postgresql_address, "The address must have ':' in it."
+    postgresql_host, postgresql_port = postgresql_address.split(":")
+
     index_type = experiment_config.pop("index_type")
     document_store = MilvusDocumentStore(
-        sql_url="postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+        sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         index=allennlp_args.index_name
     )
     assert not document_store.collection.is_empty
