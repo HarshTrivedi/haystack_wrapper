@@ -22,7 +22,7 @@ def make_image(update_if_exists: bool = False):
     user_name = get_beaker_config()["user_name"]
     beaker_workspace = get_beaker_config()["beaker_workspace"]
 
-    dockerfile_path = os.path.join("dockerfiles", "milvus_runner.dockerfile")
+    dockerfile_path = os.path.join("dockerfiles", "postgresql_milvus_runner.dockerfile")
     command = f"docker build -t {image_name} . -f {dockerfile_path}"
     print(f"Running: {command}")
     subprocess.run(command, shell=True, stdout=open(os.devnull, 'wb'))
