@@ -29,7 +29,7 @@ def main():
     milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
     assert ":" in milvus_address, "The address must have ':' in it."
     milvus_host, milvus_port = milvus_address.split(":")
-
+    milvus_host = milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
 
@@ -49,6 +49,7 @@ def main():
     index_type = experiment_config.pop("index_type")
     document_store = MilvusDocumentStore(
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
+        host=milvus_host, port=milvus_port,
         index=allennlp_args.index_name
     )
     assert not document_store.collection.is_empty

@@ -1,2 +1,3 @@
 python-dotenv
 farm-haystack
+psycopg2
