@@ -70,6 +70,7 @@ def main():
             # it has other potentially useful details, but not needed for now.
             retrieved_document_stripped = {
                 "content": retrieved_document_["content"],
+                "title": retrieved_document_["meta"]["title"],
                 "score": retrieved_document_["score"],
             }
             retrieved_documents_stripped.append(retrieved_document_stripped)
