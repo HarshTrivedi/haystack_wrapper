@@ -14,7 +14,7 @@ from pymilvus import list_collections, connections, Collection
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
-    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around HF transformers.")
+    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     allennlp_parser.add_argument("command", type=str, help="command", choices=("create", "delete"))
     allennlp_parser.add_argument(
         "experiment_name", type=str,

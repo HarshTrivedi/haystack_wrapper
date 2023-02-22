@@ -18,7 +18,7 @@ logging.getLogger("haystack").setLevel(logging.INFO)
 
 def main():
 
-    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around HF transformers.")
+    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     allennlp_parser.add_argument(
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."

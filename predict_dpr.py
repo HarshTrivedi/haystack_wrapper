@@ -23,7 +23,7 @@ def main():
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
 
-    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around HF transformers.")
+    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     allennlp_parser.add_argument(
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
