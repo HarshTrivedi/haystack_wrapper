@@ -75,7 +75,7 @@ beaker session create \
         subprocess.run(command, shell=True)
 
     if args.command == "stop":
-        assert args.force, "--force is meaningless for stop command."
+        assert not args.force, "--force is meaningless for stop command."
         command = (
             "docker rm -f postgres -f milvus-standalone -f milvus-minio -f milvus-etcd"
         )
@@ -83,7 +83,7 @@ beaker session create \
         subprocess.run(command, shell=True)
 
     if args.command == "status":
-        assert args.force, "--force is meaningless for status command."
+        assert not args.force, "--force is meaningless for status command."
         command = "docker ps -a"
         print(command)
         subprocess.run(command, shell=True)
