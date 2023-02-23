@@ -6,7 +6,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - "5432:5432" # changing it to something else doesn't let it be exposed for some reason.
+      - "8432:5432" # using 8432 to avoid the default psql port
     volumes:
       - ${POSTGRESQL_DATA_DIRECTORY}/data:/var/lib/postgresql/data
 
