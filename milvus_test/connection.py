@@ -7,7 +7,8 @@ def test_postgresql_connection():
     from sqlalchemy import create_engine
 
     # Note the address shouldn't have http://
-    postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:5432").split(":")
+    # using 8432 instead of the default 5432 port to avoid conflict in beaker.
+    postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:8432").split(":")
     assert "//" not in postgresql_host
 
     try:
