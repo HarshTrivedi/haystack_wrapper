@@ -1,7 +1,7 @@
 {
     "query_model": "facebook/dpr-question_encoder-single-nq-base",
     "passage_model": "facebook/dpr-ctx_encoder-single-nq-base",
-    "data_dir": "processed_data",
+    "data_dir": "processed_data/sample",
     "train_filename": "sample_dpr_training_data.json",
     "dev_filename": "sample_dpr_training_data.json",
     "max_processes": 128,
