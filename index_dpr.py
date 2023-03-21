@@ -30,9 +30,11 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
-    data_file_name = os.path.splitext(os.path.basename(allennlp_args.data_file_path))[0]
+    data_name = os.path.splitext(
+        allennlp_args.data_file_path
+    )[0].replace("processed_data/", "").replace("/", "__")
     index_dir = os.path.join(
-        "serialization_dir", allennlp_args.experiment_name, "indexes", data_file_name
+        "serialization_dir", allennlp_args.experiment_name, "indexes", data_name
     )
     os.makedirs(index_dir, exist_ok=True)
 
@@ -63,7 +65,7 @@ def main():
         postgresql_host.split("//")[1] if "//" in postgresql_host else postgresql_host # it shouldn't have http://
     )
 
-    index_name = "___".join([allennlp_args.experiment_name, data_file_name])
+    index_name = "___".join([allennlp_args.experiment_name, data_name])
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
