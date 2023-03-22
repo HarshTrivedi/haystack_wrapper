@@ -94,7 +94,7 @@ def main():
 
     prediction_name = os.path.splitext(
         args.prediction_file_path
-    )[0].replace("processed_data/", "").replace("/", "__") + f"__{args.num_documents}_docs.jsonl"
+    )[0].replace("processed_data/", "").replace("/", "__") + f"__{args.num_documents}_docs"
     retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
     os.makedirs(retrieval_results_dir, exist_ok=True)
     output_file_path = os.path.join(
