@@ -101,7 +101,11 @@ def main():
     allennlp_predict_subparser.add_argument(
         "prediction_data_path", type=str, help="data path to run prediction on."
     )
-    args = allennlp_base_parser.parse_args()
+    args = allennlp_root_parser.parse_args()
+
+    if not args.command:
+        allennlp_root_parser.print_help()
+        exit()
 
     experiment_config_file_path = os.path.join("experiment_configs", f"{args.experiment_name}.jsonnet")
     if not os.path.exists(experiment_config_file_path):
