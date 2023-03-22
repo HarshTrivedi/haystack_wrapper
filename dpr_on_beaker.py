@@ -96,6 +96,9 @@ def main():
         "predict", description="Predict", help="Predict", parents=[allennlp_base_parser]
     )
     allennlp_predict_subparser.add_argument(
+        "index_name", type=str, help="index name."
+    )
+    allennlp_predict_subparser.add_argument(
         "prediction_data_path", type=str, help="data path to run prediction on."
     )
     args = allennlp_base_parser.parse_args()
