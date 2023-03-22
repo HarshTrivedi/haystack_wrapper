@@ -50,41 +50,55 @@ def experiment_name_to_pretrained_experiment_name(experiment_name: str) -> str:
 
 def main():
 
-    allennlp_root_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around HF transformers.")
-    allennlp_parser = argparse.ArgumentParser(add_help=False)
+    allennlp_root_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
+    allennlp_base_parser = argparse.ArgumentParser(add_help=False)
+    allennlp_subparsers = allennlp_root_parser.add_subparsers(title="Commands", metavar="", dest="command")
 
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "experiment_name", type=str, help="experiment_name (from config file in experiment_config/)"
     )
-
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--git-hash", type=str, help="git-hash to use for experiment.", default=None
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--allow-rollback", action="store_true", default=False, help="Allow rollback / use latest already present image."
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--data-mounts", action="append", default=[], help="Additional datamounts which should be available."
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--memory", type=str, help="cpu memory, e.g. '100 GiB'", default=1
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--serialization-dataset-id", type=str, help="mount serialization_dir from given dataset id.", default=None
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--cluster", type=str,
         choices=["general", "aristo", "allennlp", "mosaic", "s2", "safe_a1000s"],
         default="safe_a1000s"
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--copy-url", action="store_true", help="don't run, just copy beaker URL."
     )
-    allennlp_parser.add_argument(
+    allennlp_base_parser.add_argument(
         "--preemptible", action="store_true", help="run on beaker with preemptible priority."
     )
-
-    args = allennlp_parser.parse_args()
+    allennlp_train_subparser = allennlp_subparsers.add_parser(
+        "train", description="Train", help="Train", parents=[allennlp_base_parser]
+    )
+    allennlp_index_subparser = allennlp_subparsers.add_parser(
+        "index", description="Index", help="Index", parents=[allennlp_base_parser]
+    )
+    allennlp_index_subparser.add_argument(
+        "index_data_path", type=str, help="data path to index."
+    )
+    allennlp_predict_subparser = allennlp_subparsers.add_parser(
+        "predict", description="Predict", help="Predict", parents=[allennlp_base_parser]
+    )
+    allennlp_predict_subparser.add_argument(
+        "prediction_data_path", type=str, help="data path to run prediction on."
+    )
+    args = allennlp_base_parser.parse_args()
 
     experiment_config_file_path = os.path.join("experiment_configs", f"{args.experiment_name}.jsonnet")
     if not os.path.exists(experiment_config_file_path):
@@ -124,7 +138,18 @@ def main():
     data_paths = list(set(data_paths))
 
     haystack_wrapper_root = experiment_config.get("haystack_wrapper_root", ".")
-    run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --force"
+
+    if args.command == "train":
+        run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --force"
+    elif args.command == "index":
+        run_command = f"python {haystack_wrapper_root}/index_dpr.py create {args.experiment_name} {args.index_data_path}"
+    elif args.command == "predict":
+        run_command = (
+            f"python {haystack_wrapper_root}/predict_dpr.py "
+            f"{args.experiment_name} {args.index_name} {args.prediction_data_path}"
+        )
+    else:
+        raise Exception(f"Unknown command {args.command}")
 
     dockerfile_file_path = os.path.join("dockerfiles", "dpr.dockerfile")
 
