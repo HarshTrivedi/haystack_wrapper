@@ -4,3 +4,4 @@ pymilvus
 python-dotenv
 farm-haystack
 psycopg2-binary
+pyperclip
