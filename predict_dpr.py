@@ -7,7 +7,7 @@ from lib import read_jsonl, write_jsonl
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
-from pymilvus import list_collections, connections
+from pymilvus import connections
 
 
 def main():
@@ -28,7 +28,6 @@ def main():
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
-    parser.add_argument("index_name", type=str, help="index_name", choices=list_collections())
     parser.add_argument("prediction_file_path", type=str, help="prediction file path")
     parser.add_argument("--num_documents", type=int, help="num_documents", default=20)
     parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
