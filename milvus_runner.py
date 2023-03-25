@@ -55,11 +55,11 @@ def main():
             container_ids = [line.split("\t")[0] for line in docker_process_logs.split("\n")]
             print("Docker bore processes running for milvus:")
             print("\n".join(container_ids))
-        if args.command == "stop":
-            for container_id in container_ids:
-                command = f"docker rm -f {container_id}"
-                print(command)
-                subprocess.call(command, shell=True)
+            if args.command == "stop":
+                for container_id in container_ids:
+                    command = f"docker rm -f {container_id}"
+                    print(command)
+                    subprocess.call(command, shell=True)
 
     if args.expose and args.command in ("start"):
         command = "sudo docker run -d -it --init --rm --network host ekzhang/bore local 19530 --to bore.pub"
