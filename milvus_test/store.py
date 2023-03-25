@@ -10,7 +10,7 @@ milvus_host, milvus_port = milvus_address.split(":")
 milvus_host = (
     milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
 )
-postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:8432").split(":")
+postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:5432").split(":")
 
 connections.add_connection(default={"host": milvus_host, "port": milvus_port})
 connections.connect()
