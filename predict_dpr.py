@@ -42,6 +42,12 @@ def main():
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
     batch_size = experiment_config.get("batch_size", args.batch_size)
 
+    index_data_path = experiment_config.pop("index_data_path")
+    data_name = os.path.splitext(
+        index_data_path
+    )[0].replace("processed_data/", "").replace("/", "__")
+    index_name = "___".join([args.experiment_name, data_name])
+
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
     postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
@@ -55,7 +61,7 @@ def main():
     document_store = MilvusDocumentStore(
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         host=milvus_host, port=milvus_port,
-        index=args.index_name
+        index=index_name
     )
     assert not document_store.collection.is_empty
     assert document_store.index_type == index_type
@@ -74,7 +80,7 @@ def main():
     retrieval_results = retriever.retrieve_batch(
         queries=queries,
         top_k=args.num_documents,
-        index=args.index_name,
+        index=index_name,
         batch_size=batch_size,
         document_store=document_store
     )
@@ -98,7 +104,7 @@ def main():
     retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
     os.makedirs(retrieval_results_dir, exist_ok=True)
     output_file_path = os.path.join(
-        retrieval_results_dir, "___".join([args.index_name, prediction_name]) + ".jsonl"
+        retrieval_results_dir, "___".join([index_name, prediction_name]) + ".jsonl"
     )
     write_jsonl(prediction_instances, output_file_path)
 

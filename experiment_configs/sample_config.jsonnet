@@ -4,6 +4,7 @@
     "data_dir": "processed_data/sample",
     "train_filename": "dpr_training_data.json",
     "dev_filename": "dpr_training_data.json",
+    "index_data_path": "processed_data/sample/dpr_index_data.jsonl",
     "max_processes": 128,
     "batch_size": 4,
     "embed_title": true,
