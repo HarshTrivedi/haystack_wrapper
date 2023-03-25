@@ -23,26 +23,26 @@ def main():
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
 
-    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
-    allennlp_parser.add_argument(
+    parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
+    parser.add_argument(
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
-    allennlp_parser.add_argument("index_name", type=str, help="index_name", choices=list_collections())
-    allennlp_parser.add_argument("prediction_file_path", type=str, help="prediction file path")
-    allennlp_parser.add_argument("--num_documents", type=int, help="num_documents", default=20)
-    allennlp_parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
-    allennlp_parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
-    allennlp_args = allennlp_parser.parse_args()
+    parser.add_argument("index_name", type=str, help="index_name", choices=list_collections())
+    parser.add_argument("prediction_file_path", type=str, help="prediction file path")
+    parser.add_argument("--num_documents", type=int, help="num_documents", default=20)
+    parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
+    parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
+    args = parser.parse_args()
 
-    experiment_config_file_path = os.path.join("experiment_configs", allennlp_args.experiment_name + ".jsonnet")
+    experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):
         exit(f"Experiment config file_path {experiment_config_file_path} not found.")
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
-    batch_size = experiment_config.get("batch_size", allennlp_args.batch_size)
+    batch_size = experiment_config.get("batch_size", args.batch_size)
 
-    serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
+    serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
     postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
     assert ":" in postgresql_address, "The address must have ':' in it."
@@ -55,7 +55,7 @@ def main():
     document_store = MilvusDocumentStore(
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         host=milvus_host, port=milvus_port,
-        index=allennlp_args.index_name
+        index=args.index_name
     )
     assert not document_store.collection.is_empty
     assert document_store.index_type == index_type
@@ -68,13 +68,13 @@ def main():
         max_seq_len_passage=440,
     )
     
-    prediction_instances = read_jsonl(allennlp_args.prediction_file_path)
+    prediction_instances = read_jsonl(args.prediction_file_path)
 
-    queries = [instance[allennlp_args.query_field] for instance in prediction_instances]
+    queries = [instance[args.query_field] for instance in prediction_instances]
     retrieval_results = retriever.retrieve_batch(
         queries=queries,
-        top_k=allennlp_args.num_documents,
-        index=allennlp_args.index_name,
+        top_k=args.num_documents,
+        index=args.index_name,
         batch_size=batch_size,
         document_store=document_store
     )
@@ -92,11 +92,13 @@ def main():
             retrieved_documents_stripped.append(retrieved_document_stripped)
         prediction_instance["retrieved_documents"] = retrieved_documents_stripped
 
-    prediction_file_name = os.path.splitext(os.path.basename(allennlp_args.prediction_file_path))[0]
+    prediction_name = os.path.splitext(
+        args.prediction_file_path
+    )[0].replace("processed_data/", "").replace("/", "__") + f"__{args.num_documents}_docs"
     retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
     os.makedirs(retrieval_results_dir, exist_ok=True)
     output_file_path = os.path.join(
-        retrieval_results_dir, "___".join([allennlp_args.index_name, prediction_file_name]) + ".jsonl"
+        retrieval_results_dir, "___".join([args.index_name, prediction_name]) + ".jsonl"
     )
     write_jsonl(prediction_instances, output_file_path)
 
