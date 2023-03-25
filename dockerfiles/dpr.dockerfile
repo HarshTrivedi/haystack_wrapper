@@ -10,8 +10,7 @@ COPY predict_dpr.py predict_dpr.py
 COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
-
-RUN conda install -c conda-forge jsonnet
+# RUN conda install -c conda-forge jsonnet # not needed
 RUN mkdir serialization_dir/
 
 # Might need the following
