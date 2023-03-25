@@ -23,7 +23,7 @@ def main():
     if args.command == "start":
         command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} up -d"
     elif args.command == "stop":
-        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} down"
+        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} down --remove-orphans"
     elif args.command == "status":
         command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} ps"
     elif args.command == "delete":
