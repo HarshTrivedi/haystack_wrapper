@@ -5,6 +5,7 @@ import subprocess
 
 import _jsonnet
 import pyperclip
+from dotenv import load_env
 
 from beakerizer import utils as beaker_utils
 from lib import flatten_dict, get_wandb_configs
@@ -49,7 +50,7 @@ def experiment_name_to_pretrained_experiment_name(experiment_name: str) -> str:
 
 
 def main():
-
+    load_env()
     allennlp_root_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     allennlp_base_parser = argparse.ArgumentParser(add_help=False)
     allennlp_subparsers = allennlp_root_parser.add_subparsers(title="Commands", metavar="", dest="command")
@@ -164,6 +165,10 @@ def main():
         str(key).replace(".", "__"): str(value) for key, value in flatten_dict(experiment_config).items()
     }
     envs["IS_ON_BEAKER"] = "true"
+    envs["POSTGRESQL_DATA_DIRECTORY"] = os.environ["POSTGRESQL_DATA_DIRECTORY"]
+    envs["MILVUS_DATA_DIRECTORY"] = os.environ["MILVUS_DATA_DIRECTORY"]
+    envs["POSTGRESQL_SERVER_ADDRESS"] = os.environ["POSTGRESQL_SERVER_ADDRESS"]
+    envs["MILVUS_SERVER_ADDRESS"] = os.environ["MILVUS_SERVER_ADDRESS"]
 
     wandb_configs = get_wandb_configs()
     if wandb_configs is None:
