@@ -14,27 +14,27 @@ from pymilvus import list_collections, connections, Collection
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
-    allennlp_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
-    allennlp_parser.add_argument("command", type=str, help="command", choices=("create", "delete"))
-    allennlp_parser.add_argument(
+    parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
+    parser.add_argument("command", type=str, help="command", choices=("create", "delete"))
+    parser.add_argument(
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
-    allennlp_parser.add_argument("data_file_path", type=str, help="data file path")
-    allennlp_args = allennlp_parser.parse_args()
+    args = parser.parse_args()
     load_dotenv()
 
-    experiment_config_file_path = os.path.join("experiment_configs", allennlp_args.experiment_name + ".jsonnet")
+    experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):
         exit(f"Experiment config file_path {experiment_config_file_path} not found.")
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
+    index_data_path = experiment_config.pop("index_data_path")
     data_name = os.path.splitext(
-        allennlp_args.data_file_path
+        index_data_path
     )[0].replace("processed_data/", "").replace("/", "__")
     index_dir = os.path.join(
-        "serialization_dir", allennlp_args.experiment_name, "indexes", data_name
+        "serialization_dir", args.experiment_name, "indexes", data_name
     )
     os.makedirs(index_dir, exist_ok=True)
 
@@ -65,7 +65,7 @@ def main():
         postgresql_host.split("//")[1] if "//" in postgresql_host else postgresql_host # it shouldn't have http://
     )
 
-    index_name = "___".join([allennlp_args.experiment_name, data_name])
+    index_name = "___".join([args.experiment_name, data_name])
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
@@ -75,13 +75,13 @@ def main():
         embedding_dim=768, id_field="id", embedding_field="embedding"
     )
 
-    if allennlp_args.command == "delete":
+    if args.command == "delete":
         document_store.delete_index(index_name)
 
-    if allennlp_args.command == "create":
+    if args.command == "create":
 
         print("Reading input documents.")
-        documents = read_jsonl(allennlp_args.data_file_path)
+        documents = read_jsonl(args.data_file_path)
         num_documents = len(documents)
         print(f"Number of input documents: {num_documents}")
 
@@ -89,7 +89,7 @@ def main():
         document_store.write_documents(documents)
         # NOTE: I can iterate over the documents using get_all_documents_generator or get_all_documents functions.
 
-        serialization_dir = os.path.join("serialization_dir", allennlp_args.experiment_name)
+        serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
         print("Loading DPR retriever models.")
         retriever = DensePassageRetriever.load(
