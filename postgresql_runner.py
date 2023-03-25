@@ -58,7 +58,7 @@ def main():
             print("\n".join(container_ids))
             if args.command == "stop":
                 for container_id in container_ids:
-                    command = f"docker rm -f {container_id}"
+                    command = f"sudo docker rm -f {container_id}"
                     print(command)
                     subprocess.call(command, shell=True)
 
