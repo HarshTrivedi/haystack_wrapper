@@ -15,6 +15,7 @@ def main():
 
     load_dotenv()
     milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
+    milvus_address = milvus_address.split("//")[1] if "//" in milvus_address else milvus_address
     assert ":" in milvus_address, "The address must have ':' in it."
     milvus_host, milvus_port = milvus_address.split(":")
     milvus_host = (
@@ -50,6 +51,7 @@ def main():
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
     postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
+    postgresql_address = postgresql_address.split("//")[1] if "//" in postgresql_address else postgresql_address
     assert ":" in postgresql_address, "The address must have ':' in it."
     postgresql_host, postgresql_port = postgresql_address.split(":")
     postgresql_host = (
