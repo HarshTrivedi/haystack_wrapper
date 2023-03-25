@@ -62,7 +62,7 @@ def main():
     if args.expose and args.command in ("start"):
         command = "sudo docker run -d -it --init --rm --network host ekzhang/bore local 5432 --to bore.pub"
         result = subprocess.run(command.split(), stdout=subprocess.PIPE)
-        container_id = result.stdout.decode("utf-8")
+        container_id = result.stdout.decode("utf-8").strip()
         if len(container_id) != 64:
             exit("The output of the bore run isn't a docker container ID, something went wrong.")
         print(f"The bore container ID is: {container_id}") # you can get it by using sudo docker ps -a also.
