@@ -1,3 +1,4 @@
+import re
 import os
 import argparse
 import subprocess
@@ -41,11 +42,37 @@ def main():
         print(command)
 
     subprocess.call(command, shell=True)
+    subprocess.check_output(command)
 
-    if args.expose:
-        command = "bore local 5432 --to bore.pub"
-        subprocess.call(command, shell=True)
+    if args.expose and args.command in ("status", "delete"):
+        command = "sudo docker ps -a | grep 'local 5432'"
+        docker_process_logs = subprocess.run(command.split(), stdout=subprocess.PIPE)
+        docker_process_logs = docker_process_logs.stdout.decode("utf-8").strip()
+        if not docker_process_logs:
+            print("No docker bore process running for postgresql.")
+        else:
+            container_ids = [line.split("\t")[0] for line in docker_process_logs.split("\n")]
+            print("Docker bore processes running for postgresql:")
+            print("\n".join(container_ids))
+        if args.command == "stop":
+            for container_id in container_ids:
+                command = f"docker rm -f {container_id}"
+                print(command)
+                subprocess.call(command, shell=True)
 
+    if args.expose and args.command in ("start"):
+        command = "sudo docker run -d -it --init --rm --network host ekzhang/bore local 5432 --to bore.pub"
+        result = subprocess.run(command.split(), stdout=subprocess.PIPE)
+        container_id = result.stdout.decode("utf-8")
+        if len(container_id) != 64:
+            exit("The output of the bore run isn't a docker container ID, something went wrong.")
+        print(f"The bore container ID is: {container_id}") # you can get it by using sudo docker ps -a also.
+
+        command = f"sudo docker logs {container_id}"
+        bore_logs = subprocess.run(command.split(), stdout=subprocess.PIPE)
+        bore_logs = bore_logs.stdout.decode("utf-8")
+        remote_port = re.sub(r'.*remote_port=(\d+).*', r'\1', bore_logs.split("\n")[0])
+        print(f"Postgress is running open http://bore.pub:{remote_port}")
 
 if __name__ == "__main__":
     main()
