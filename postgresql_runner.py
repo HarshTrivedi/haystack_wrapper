@@ -73,5 +73,6 @@ def main():
         remote_port = bore_logs.strip().split("bore.pub:")[1]
         print(f"Postgress is running open http://bore.pub:{remote_port}")
 
+
 if __name__ == "__main__":
     main()
