@@ -70,7 +70,7 @@ def main():
         command = f"sudo docker logs {container_id}"
         bore_logs = subprocess.run(command.split(), stdout=subprocess.PIPE)
         bore_logs = bore_logs.stdout.decode("utf-8")
-        remote_port = re.sub(r'.*remote_port=(\d+).*', r'\1', bore_logs.split("\n")[0])
+        remote_port = bore_logs.strip().split("bore.pub:")[1]
         print(f"Postgress is running open http://bore.pub:{remote_port}")
 
 if __name__ == "__main__":
