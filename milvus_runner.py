@@ -44,7 +44,6 @@ def main():
         print(command)
 
     subprocess.call(command, shell=True)
-    subprocess.check_output(command)
 
     if args.expose and args.command in ("status", "delete"):
         command = "sudo docker ps -a | grep 'local 19530'"
