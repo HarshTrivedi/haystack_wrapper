@@ -43,7 +43,7 @@ def main():
 
     subprocess.call(command, shell=True)
 
-    if args.expose and args.command in ("status", "delete"):
+    if args.command in ("status", "delete"):
         command = "sudo docker ps -a | grep 'local 5432'"
         docker_process_logs = subprocess.run(command.split(), stdout=subprocess.PIPE)
         docker_process_logs = docker_process_logs.stdout.decode("utf-8").strip()
