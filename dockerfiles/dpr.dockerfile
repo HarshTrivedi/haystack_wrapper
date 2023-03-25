@@ -1,4 +1,4 @@
-FROM deepset/haystack:gpu-main
+FROM deepset/haystack-gpu:latest
 
 WORKDIR /run/
 
