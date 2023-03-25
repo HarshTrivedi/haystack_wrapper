@@ -45,8 +45,8 @@ def main():
 
     if args.command in ("status", "stop"):
         command = "sudo docker ps -a"
-        docker_process_logs = subprocess.run(command.split(), shell=True)
-        docker_process_logs = docker_process_logs.stdout.decode("utf-8").strip()
+        result = subprocess.run(command.split(), stdout=subprocess.PIPE)
+        docker_process_logs = result.stdout.decode("utf-8").strip()
         if not docker_process_logs:
             print("No docker bore process running for postgresql.")
         else:
