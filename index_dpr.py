@@ -81,7 +81,7 @@ def main():
     if args.command == "create":
 
         print("Reading input documents.")
-        documents = read_jsonl(args.data_file_path)
+        documents = read_jsonl(index_data_path)
         num_documents = len(documents)
         print(f"Number of input documents: {num_documents}")
 
