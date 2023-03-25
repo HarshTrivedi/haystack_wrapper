@@ -51,7 +51,7 @@ def main():
             print("No docker bore process running for postgresql.")
         else:
             container_ids = [
-                line.split("\t")[0] for line in docker_process_logs.split("\n")
+                line.split()[0] for line in docker_process_logs.split("\n")
                 if "local 5432" in line
             ]
             print("Docker bore processes running for postgresql:")
