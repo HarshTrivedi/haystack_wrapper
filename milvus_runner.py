@@ -46,13 +46,16 @@ def main():
     subprocess.call(command, shell=True)
 
     if args.command in ("status", "stop"):
-        command = "sudo docker ps -a | grep 'local 19530'"
+        command = "sudo docker ps -a"
         docker_process_logs = subprocess.run(command.split(), stdout=subprocess.PIPE)
         docker_process_logs = docker_process_logs.stdout.decode("utf-8").strip()
         if not docker_process_logs:
             print("No docker bore process running for milvus.")
         else:
-            container_ids = [line.split("\t")[0] for line in docker_process_logs.split("\n")]
+            container_ids = [
+                line.split("\t")[0] for line in docker_process_logs.split("\n")
+                if "local 19530" in line
+            ]
             print("Docker bore processes running for milvus:")
             print("\n".join(container_ids))
             if args.command == "stop":
