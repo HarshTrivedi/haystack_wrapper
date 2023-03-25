@@ -1,16 +1,12 @@
-import os
 from dotenv import load_dotenv
 from haystack.document_stores import MilvusDocumentStore
-from pymilvus import list_collections, connections
+from pymilvus import connections
+from lib import get_postgresql_address, get_milvus_address
 
 load_dotenv()
-milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
-assert ":" in milvus_address, "The address must have ':' in it."
-milvus_host, milvus_port = milvus_address.split(":")
-milvus_host = (
-    milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
-)
-postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:8432").split(":")
+
+milvus_host, milvus_port = get_milvus_address()
+postgresql_host, postgresql_port = get_postgresql_address()
 
 connections.add_connection(default={"host": milvus_host, "port": milvus_port})
 connections.connect()

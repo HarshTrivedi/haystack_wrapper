@@ -1,13 +1,12 @@
-import os
 from dotenv import load_dotenv
+from lib import get_postgresql_address, get_milvus_address
 
 
 def test_postgresql_connection():
 
     from sqlalchemy import create_engine
 
-    postgresql_host, postgresql_port = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:5432").split(":")
-    assert "//" not in postgresql_host
+    postgresql_host, postgresql_port = get_postgresql_address()
 
     try:
         engine = create_engine(f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres")
@@ -21,9 +20,7 @@ def test_milvus_connection():
 
     from pymilvus import connections
 
-    # Note the address shouldn't have http://
-    milvus_host, milvus_port = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530").split(":")
-    assert "//" not in milvus_host
+    milvus_host, milvus_port = get_milvus_address()
 
     try:
         connections.add_connection(default={"host": milvus_host, "port": milvus_port})
