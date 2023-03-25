@@ -4,11 +4,12 @@ import argparse
 import time
 
 import _jsonnet
-from lib import read_jsonl
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
+
+from lib import read_jsonl, get_postgresql_address, get_milvus_address
 
 
 def main():
@@ -38,15 +39,8 @@ def main():
     )
     os.makedirs(index_dir, exist_ok=True)
 
-    milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
-    milvus_address = milvus_address.split("//")[1] if "//" in milvus_address else milvus_address
-    assert ":" in milvus_address, "The address must have ':' in it."
-    milvus_host, milvus_port = milvus_address.split(":")
-    # TODO: Shift this to a command show_stats.
-    print("Milvus indexes and their sizes: ")
-    milvus_host = (
-        milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
-    )
+    milvus_host, milvus_port = get_milvus_address()
+
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
     collection_names = list_collections()
@@ -59,13 +53,7 @@ def main():
 
     print("Building MilvusDocumentStore.")
 
-    postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
-    postgresql_address = postgresql_address.split("//")[1] if "//" in postgresql_address else postgresql_address
-    assert ":" in postgresql_address, "The address must have ':' in it."
-    postgresql_host, postgresql_port = postgresql_address.split(":")
-    postgresql_host = (
-        postgresql_host.split("//")[1] if "//" in postgresql_host else postgresql_host # it shouldn't have http://
-    )
+    postgresql_host, postgresql_port = get_postgresql_address()
 
     index_name = "___".join([args.experiment_name, data_name])
     index_type = experiment_config.pop("index_type")

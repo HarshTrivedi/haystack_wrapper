@@ -3,24 +3,19 @@ import json
 import argparse
 
 import _jsonnet
-from lib import read_jsonl, write_jsonl
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import connections
+
+from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
 
 
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
     load_dotenv()
-    milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:19530")
-    milvus_address = milvus_address.split("//")[1] if "//" in milvus_address else milvus_address
-    assert ":" in milvus_address, "The address must have ':' in it."
-    milvus_host, milvus_port = milvus_address.split(":")
-    milvus_host = (
-        milvus_host.split("//")[1] if "//" in milvus_host else milvus_host # it shouldn't have http://
-    )
+    milvus_host, milvus_port = get_milvus_address()
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
 
@@ -50,13 +45,7 @@ def main():
 
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
-    postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "127.0.0.1:5432")
-    postgresql_address = postgresql_address.split("//")[1] if "//" in postgresql_address else postgresql_address
-    assert ":" in postgresql_address, "The address must have ':' in it."
-    postgresql_host, postgresql_port = postgresql_address.split(":")
-    postgresql_host = (
-        postgresql_host.split("//")[1] if "//" in postgresql_host else postgresql_host # it shouldn't have http://
-    )
+    postgresql_host, postgresql_port = get_postgresql_address()
 
     index_type = experiment_config.pop("index_type")
     document_store = MilvusDocumentStore(
