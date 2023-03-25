@@ -7,7 +7,7 @@ COPY lib.py lib.py
 COPY train_dpr.py train_dpr.py
 COPY index_dpr.py index_dpr.py
 COPY predict_dpr.py predict_dpr.py
-COPY requirements.py requirements.py
+COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
