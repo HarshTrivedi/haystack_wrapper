@@ -5,7 +5,7 @@ import subprocess
 
 import _jsonnet
 import pyperclip
-from dotenv import load_env
+from dotenv import load_dotenv
 
 from beakerizer import utils as beaker_utils
 from lib import flatten_dict, get_wandb_configs
@@ -50,7 +50,7 @@ def experiment_name_to_pretrained_experiment_name(experiment_name: str) -> str:
 
 
 def main():
-    load_env()
+    load_dotenv()
     allennlp_root_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     allennlp_base_parser = argparse.ArgumentParser(add_help=False)
     allennlp_subparsers = allennlp_root_parser.add_subparsers(title="Commands", metavar="", dest="command")
