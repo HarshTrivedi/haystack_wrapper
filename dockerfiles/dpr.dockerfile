@@ -2,9 +2,12 @@ FROM deepset/haystack-gpu:latest
 
 WORKDIR /run/
 
+COPY run_name.py run_name.py
+COPY lib.py lib.py
 COPY train_dpr.py train_dpr.py
 COPY index_dpr.py index_dpr.py
 COPY predict_dpr.py predict_dpr.py
+COPY requirements.py requirements.py
 
 RUN pip install -r requirements.txt
 
