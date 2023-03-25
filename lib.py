@@ -56,3 +56,21 @@ def get_beaker_configs() -> Dict:
     with open(file_path) as file:
         beaker_configs = json.load(file)
     return beaker_configs
+
+
+def get_postgresql_address():
+    postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:5432")
+    postgresql_address = postgresql_address.split("//")[1] if "//" in postgresql_address else postgresql_address
+    assert ":" in postgresql_address
+    postgresql_host, postgresql_port = postgresql_address.split(":")
+    assert "//" not in postgresql_host
+    return postgresql_host, postgresql_port
+
+
+def get_milvus_address():
+    milvus_address = os.environ.get("MILVUS_SERVER_ADDRESS", "localhost:5432")
+    milvus_address = milvus_address.split("//")[1] if "//" in milvus_address else milvus_address
+    assert ":" in milvus_address
+    milvus_host, milvus_port = milvus_address.split(":")
+    assert "//" not in milvus_host
+    return milvus_host, milvus_port
