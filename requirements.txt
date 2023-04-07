@@ -2,6 +2,6 @@ dictparse
 jsonnet
 pymilvus
 python-dotenv
-farm-haystack
+farm-haystack[all-gpu]
 psycopg2-binary
 pyperclip
