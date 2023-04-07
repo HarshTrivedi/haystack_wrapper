@@ -9,6 +9,7 @@ from haystack.document_stores import MilvusDocumentStore
 from pymilvus import connections
 
 from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
+from index_dpr import get_index_name
 
 
 def main():
@@ -38,10 +39,7 @@ def main():
     batch_size = experiment_config.get("batch_size", args.batch_size)
 
     index_data_path = experiment_config.pop("index_data_path")
-    data_name = os.path.splitext(
-        index_data_path
-    )[0].replace("processed_data/", "").replace("/", "__")
-    index_name = "___".join([args.experiment_name, data_name])
+    index_name = get_index_name(args.experiment_name, index_data_path)
 
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 

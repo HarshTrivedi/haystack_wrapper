@@ -12,6 +12,25 @@ from pymilvus import list_collections, connections, Collection
 from lib import read_jsonl, get_postgresql_address, get_milvus_address
 
 
+def get_index_name(experiment_name: str, index_data_path: str) -> str:
+    data_name = os.path.splitext(
+        index_data_path
+    )[0].replace("processed_data/", "").replace("/", "__")
+
+    index_name = "___".join([experiment_name, data_name])
+    return index_name
+
+
+def get_index_dir(experiment_name: str, index_data_path: str) -> str:
+    data_name = os.path.splitext(
+        index_data_path
+    )[0].replace("processed_data/", "").replace("/", "__")
+    index_dir = os.path.join(
+        "serialization_dir", experiment_name, "indexes", data_name
+    )
+    return index_dir
+
+
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
@@ -31,12 +50,7 @@ def main():
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
     index_data_path = experiment_config.pop("index_data_path")
-    data_name = os.path.splitext(
-        index_data_path
-    )[0].replace("processed_data/", "").replace("/", "__")
-    index_dir = os.path.join(
-        "serialization_dir", args.experiment_name, "indexes", data_name
-    )
+    index_dir = get_index_dir(args.experiment_name, index_data_path)
     os.makedirs(index_dir, exist_ok=True)
 
     milvus_host, milvus_port = get_milvus_address()
@@ -55,7 +69,7 @@ def main():
 
     postgresql_host, postgresql_port = get_postgresql_address()
 
-    index_name = "___".join([args.experiment_name, data_name])
+    index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     document_store = MilvusDocumentStore(
