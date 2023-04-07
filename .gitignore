@@ -138,3 +138,4 @@ docker-compose.yml
 .temp
 beakerizer
 beaker_configs
+.beaker_experiment_specs

@@ -12,6 +12,7 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 # RUN conda install -c conda-forge jsonnet # not needed
 RUN mkdir serialization_dir/
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Might need the following
 # https://github.com/coqui-ai/TTS/issues/1517 (this fixed that error locally)
