@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
+FROM huggingface/transformers-pytorch-gpu:4.27.4
 
 WORKDIR /run/
 
