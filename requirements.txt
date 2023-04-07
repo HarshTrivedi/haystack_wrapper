@@ -2,6 +2,8 @@ dictparse
 jsonnet
 pymilvus
 python-dotenv
-farm-haystack[all-gpu]
+farm-haystack[milvus]==v1.15.0
 psycopg2-binary
 pyperclip
+
+4.25.1
