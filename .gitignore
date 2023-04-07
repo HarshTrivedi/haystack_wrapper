@@ -137,3 +137,4 @@ docker-compose.yml
 .history
 .temp
 beakerizer
+beaker_configs
