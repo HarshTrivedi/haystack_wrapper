@@ -206,6 +206,7 @@ def main():
     )
 
     if not args.copy_url:
+        os.makedirs(beakerizer_config_file_path, exist_ok=True)
         print(f"Writing beaker config in {beakerizer_config_file_path}")
         with open(beakerizer_config_file_path, "w") as file:
             json.dump(beakerizer_config, file, indent=4)
