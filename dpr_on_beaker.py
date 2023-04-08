@@ -197,6 +197,8 @@ def main():
     output_directory = os.path.join("serialization_dir", args.experiment_name)
 
     local_output_directory = beaker_output_directory = output_directory
+    if args.command == "index":
+        beaker_output_directory = os.path.join("/run", "beaker_output") # it has not output, mainly no-op.
     if args.command == "predict":
         local_output_directory = os.path.join(output_directory, "retrieval_results")
         beaker_output_directory = os.path.join("/run", "beaker_output")
