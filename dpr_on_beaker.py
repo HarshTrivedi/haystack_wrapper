@@ -197,12 +197,9 @@ def main():
         "envs": envs,
     }
 
-    if hasattr(args, "index_data_path"):
-        data_path = args.index_data_path
-    elif hasattr(args, "prediction_data_path"):
+    data_path = ""
+    if hasattr(args, "prediction_data_path"):
         data_path = args.prediction_data_path
-    else:
-        data_path = ""
 
     beaker_experiment_name = get_run_name(args.command, args.experiment_name, data_path)
     beakerizer_config_file_path = os.path.join(
