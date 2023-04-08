@@ -21,7 +21,7 @@ def main():
     assert os.path.exists(docker_compose_file_path)
 
     if args.command == "start":
-        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} up -d"
+        command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} --env-file .env up -d"
     elif args.command == "stop":
         command = f"echo <password> | sudo -S docker-compose -f {docker_compose_file_path} down"
     elif args.command == "status":

@@ -11,6 +11,6 @@ RUN bash install_docker_compose.sh
 
 # To run the server directly:
 ENTRYPOINT ["docker", "compose", "up", "-d"]
- 
+
 # To run bash:
 # ENTRYPOINT ["bash", "-l"]
