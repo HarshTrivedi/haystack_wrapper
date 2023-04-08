@@ -6,7 +6,7 @@ def get_run_name(command: str, experiment_name: str, dataset_filepath: str = "")
     # I don't import it here to avoid unnecessary repository dependency.
     assert command in ("train", "index", "evaluate", "predict")
     dataset_filepath = dataset_filepath.strip()
-    assert (command in ("index", "evaluate", "predict")) == bool(dataset_filepath), \
+    assert (command in ("evaluate", "predict")) == bool(dataset_filepath), \
         "The beaker name can be obtained for train with dataset_filepath and for evaluate/prediction without."
     text2hash = lambda text: str(
         int(hashlib.sha256(text.encode("utf-8")).hexdigest(), 16) % 10**8

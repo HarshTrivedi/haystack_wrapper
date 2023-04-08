@@ -90,9 +90,6 @@ def main():
     allennlp_index_subparser = allennlp_subparsers.add_parser(
         "index", description="Index", help="Index", parents=[allennlp_base_parser]
     )
-    allennlp_index_subparser.add_argument(
-        "index_data_path", type=str, help="data path to index."
-    )
     allennlp_predict_subparser = allennlp_subparsers.add_parser(
         "predict", description="Predict", help="Predict", parents=[allennlp_base_parser]
     )
