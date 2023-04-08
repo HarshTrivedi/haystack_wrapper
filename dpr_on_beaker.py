@@ -153,14 +153,14 @@ def main():
         run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --force"
     elif args.command == "index":
         run_command = f"python {haystack_wrapper_root}/index_dpr.py create {args.experiment_name}"
-        suffix_command = f" && mv serialization_dir/{args.experiment_name}/retrieval_results beaker_output/"
+        suffix_command = f"mv serialization_dir/{args.experiment_name}/retrieval_results beaker_output/"
         run_command = f"/bin/sh -c {run_command} && {suffix_command}"
     elif args.command == "predict":
         run_command = (
             f"python {haystack_wrapper_root}/predict_dpr.py "
             f"{args.experiment_name} {args.prediction_data_path}"
         )
-        suffix_command = f" && mv serialization_dir/{args.experiment_name}/indexes beaker_output/"
+        suffix_command = f"mv serialization_dir/{args.experiment_name}/indexes beaker_output/"
         run_command = f"/bin/sh -c {run_command} && {suffix_command}"
     else:
         raise Exception(f"Unknown command {args.command}")
