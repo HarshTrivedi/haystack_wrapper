@@ -180,6 +180,11 @@ def main():
 
         envs["WANDB_RUN_NAME"] = run_name
 
+    if args.command in ("index", "predict"):
+        load_dotenv()
+        envs["POSTGRESQL_SERVER_ADDRESS"] = os.environ["POSTGRESQL_SERVER_ADDRESS"]
+        envs["MILVUS_SERVER_ADDRESS"] = os.environ["MILVUS_SERVER_ADDRESS"]
+
     output_directory = os.path.join("serialization_dir", args.experiment_name)
 
     beakerizer_config = {
