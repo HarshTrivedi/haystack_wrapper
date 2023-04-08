@@ -125,6 +125,9 @@ def main():
     if args.command == "index":
         data_paths.append(index_data_path)
 
+    if args.command == "predict":
+        data_paths.append(args.prediction_data_path)
+
     # Infer dependencies of pretrained experiment names
     pretrained_experiment_names = []
     experiment_name_ = experiment_name_to_pretrained_experiment_name(args.experiment_name)
