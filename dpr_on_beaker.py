@@ -153,11 +153,13 @@ def main():
         run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --force"
     elif args.command == "index":
         run_command = f"python {haystack_wrapper_root}/index_dpr.py create {args.experiment_name}"
+        run_command += f" && mv serialization_dir/{args.experiment_name}/retrieval_results beaker_output/"
     elif args.command == "predict":
         run_command = (
             f"python {haystack_wrapper_root}/predict_dpr.py "
             f"{args.experiment_name} {args.prediction_data_path}"
         )
+        run_command += f" && mv serialization_dir/{args.experiment_name}/indexes beaker_output/"
     else:
         raise Exception(f"Unknown command {args.command}")
 
@@ -195,10 +197,14 @@ def main():
 
     output_directory = os.path.join("serialization_dir", args.experiment_name)
 
-    if args.command == "index":
-        output_directory = os.path.join(output_directory, "indexes")
-    if args.command == "predict":
-        output_directory = os.path.join(output_directory, "retrieval_results")
+    if args.command == "train":
+        local_output_directory = beaker_output_directory = output_directory
+    elif args.command == "index":
+        local_output_directory = os.path.join(output_directory, "indexes")
+        beaker_output_directory = os.path.join("/run", "beaker_output")
+    elif args.command == "predict":
+        local_output_directory = os.path.join(output_directory, "retrieval_results")
+        beaker_output_directory = os.path.join("/run", "beaker_output")
 
     beakerizer_config = {
         "command": run_command,
