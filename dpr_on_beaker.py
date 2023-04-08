@@ -144,8 +144,7 @@ def main():
         beaker_pretrained_experiment_name = get_run_name(
             "train", pretrained_experiment_name
         )
-        data_paths.append(f"result_of__{beaker_pretrained_experiment_name}")
-
+        data_paths.append(f"result_of_{beaker_pretrained_experiment_name}")
     data_paths = list(set(data_paths))
 
     haystack_wrapper_root = experiment_config.get("haystack_wrapper_root", ".")
@@ -195,6 +194,11 @@ def main():
         envs["MILVUS_SERVER_ADDRESS"] = os.environ["MILVUS_SERVER_ADDRESS"]
 
     output_directory = os.path.join("serialization_dir", args.experiment_name)
+
+    if args.command == "index":
+        output_directory = os.path.join(output_directory, "indexes")
+    if args.command == "predict":
+        output_directory = os.path.join(output_directory, "retrieval_results")
 
     beakerizer_config = {
         "command": run_command,
