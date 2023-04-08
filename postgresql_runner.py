@@ -2,6 +2,7 @@ import re
 import os
 import argparse
 import subprocess
+import time
 
 
 def main():
@@ -69,6 +70,7 @@ def main():
         if len(container_id) != 64:
             exit("The output of the bore run isn't a docker container ID, something went wrong.")
         print(f"The bore container ID is: {container_id}") # you can get it by using sudo docker ps -a also.
+        time.sleep(2)
 
         command = f"sudo docker logs {container_id}"
         bore_logs = subprocess.run(command.split(), stdout=subprocess.PIPE)
