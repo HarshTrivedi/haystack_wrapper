@@ -21,16 +21,6 @@ def get_index_name(experiment_name: str, index_data_path: str) -> str:
     return index_name
 
 
-def get_index_dir(experiment_name: str, index_data_path: str) -> str:
-    data_name = os.path.splitext(
-        index_data_path
-    )[0].replace("processed_data/", "").replace("/", "__")
-    index_dir = os.path.join(
-        "serialization_dir", experiment_name, "indexes", data_name
-    )
-    return index_dir
-
-
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
@@ -50,8 +40,6 @@ def main():
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
     index_data_path = experiment_config.pop("index_data_path")
-    index_dir = get_index_dir(args.experiment_name, index_data_path)
-    os.makedirs(index_dir, exist_ok=True)
 
     milvus_host, milvus_port = get_milvus_address()
 

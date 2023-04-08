@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--num_documents", type=int, help="num_documents", default=10)
     parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
     parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
+    parser.add_argument("--output-directory", type=str, help="output_directory", default=None)
     args = parser.parse_args()
 
     experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
@@ -90,6 +91,10 @@ def main():
         args.prediction_file_path
     )[0].replace("processed_data/", "").replace("/", "__") + f"__{args.num_documents}_docs"
     retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
+
+    if args.output_directory:
+        retrieval_results_dir = args.output_directory
+
     os.makedirs(retrieval_results_dir, exist_ok=True)
     output_file_path = os.path.join(
         retrieval_results_dir, "___".join([index_name, prediction_name]) + ".jsonl"
