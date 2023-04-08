@@ -134,6 +134,11 @@ def main():
         if experiment_name_ is not None:
             pretrained_experiment_names.append(experiment_name_)
 
+    if args.command == "index":
+        # For indexing, the training must have already been finished,
+        # which is necessary to be available.
+        pretrained_experiment_names.append(args.experiment_name)
+
     # Mount training experiment dir so that archive can be found
     for pretrained_experiment_name in pretrained_experiment_names:
         beaker_pretrained_experiment_name = get_run_name(
