@@ -118,8 +118,12 @@ def main():
     dev_filename = experiment_config.get("dev_filename")
     train_data_path = os.path.join(data_dir, train_filename)
     validation_data_path = os.path.join(data_dir, dev_filename)
+    index_data_path = experiment_config.pop("index_data_path")
 
     data_paths.extend([train_data_path, validation_data_path])
+
+    if args.command == "index":
+        data_paths.append(index_data_path)
 
     # Infer dependencies of pretrained experiment names
     pretrained_experiment_names = []
