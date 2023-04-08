@@ -200,7 +200,14 @@ def main():
         "envs": envs,
     }
 
-    beaker_experiment_name = get_run_name("train", args.experiment_name)
+    if hasattr(args, "index_data_path"):
+        data_path = args.index_data_path
+    elif hasattr(args, "prediction_data_path"):
+        data_path = args.prediction_data_path
+    else:
+        data_path = ""
+
+    beaker_experiment_name = get_run_name(args.command, args.experiment_name, data_path)
     beakerizer_config_file_path = os.path.join(
         "beaker_configs", beaker_experiment_name + ".jsonnet"
     )
