@@ -25,7 +25,7 @@ def main():
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
-    parser.add_argument("prediction_file_path", type=str, help="prediction file path")
+    parser.add_argument("prediction_file_path", type=str, help="prediction file path", required=False, default=None)
     parser.add_argument("--num_documents", type=int, help="num_documents", default=10)
     parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
     parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
@@ -41,6 +41,13 @@ def main():
 
     index_data_path = experiment_config.pop("index_data_path")
     index_name = get_index_name(args.experiment_name, index_data_path)
+
+    if not args.prediction_file_path:
+        print("The prediction file path is not passed, defaulting to dev file_path from the config:")
+        args.prediction_file_path = os.path.join(
+            experiment_config["data_dir"], experiment_config["dev_filename"]
+        )
+        print(args.prediction_file_path)
 
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
