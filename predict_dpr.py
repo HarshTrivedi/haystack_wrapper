@@ -55,13 +55,25 @@ def main():
     assert not document_store.collection.is_empty
     assert document_store.index_type == index_type
 
-    retriever = DensePassageRetriever.load(
-        load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
-        query_encoder_dir="query_encoder",
-        passage_encoder_dir="passage_encoder",
-        max_seq_len_query=60,
-        max_seq_len_passage=440,
-    )
+    dont_train = experiment_config.pop("dont_train", False)
+    if dont_train:
+        query_model = experiment_config["query_model"]
+        passage_model = experiment_config["passage_model"]
+        retriever = DensePassageRetriever(
+            document_store=None,
+            query_embedding_model=query_model,
+            passage_embedding_model=passage_model,
+            max_seq_len_query=60,
+            max_seq_len_passage=440,
+        )
+    else:
+        retriever = DensePassageRetriever.load(
+            load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
+            query_encoder_dir="query_encoder",
+            passage_encoder_dir="passage_encoder",
+            max_seq_len_query=60,
+            max_seq_len_passage=440,
+        )
     
     prediction_instances = read_jsonl(args.prediction_file_path)
 
