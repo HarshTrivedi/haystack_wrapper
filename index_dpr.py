@@ -76,11 +76,13 @@ def main():
 
         for slice_index in range(index_num_chunks):
             print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
-            documents = [
-                document for document in yield_jsonl_slice(
-                    index_data_path, index_num_chunks, slice_index
-                )
-            ]
+            documents = []
+            for document in yield_jsonl_slice(
+                index_data_path, index_num_chunks, slice_index
+            ):
+                document["id"] = document["id"][-100:] # o/w raises error. The true ID will be in the metadata.
+                documents.append(document)
+
             num_documents = len(documents)
             print(f"Number of documents: {num_documents}")
             print("Writing documents in MilvusDocumentStore.")

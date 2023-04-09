@@ -3,6 +3,7 @@ import json
 import math
 from typing import Dict, List, Union, Any
 from tqdm import tqdm
+from functools import lru_cache
 
 
 def read_json(file_path: str) -> Union[List, Dict]:
@@ -24,16 +25,42 @@ def write_jsonl(instances: List[Dict], file_path: str):
             file.write(json.dumps(instance)+"\n")
 
 
+def yield_jsonl(file_path: str, size: int):
+    print(f"Yielding {size} instances from {file_path}")
+    with open(file_path, "r") as file:
+        instances = []
+        for line in file:
+            if not line.strip():
+                continue
+            instances.append(json.loads(line.strip()))
+            if len(instances) >= size:
+                yield instances
+                instances = []
+    yield instances
+
+
+@lru_cache(maxsize=None)
+def get_file_num_lines(file_path: str) -> int:
+    print(f"Counting num lines in {file_path}")
+    with open(file_path) as file:
+        number_of_lines = sum(1 for i in file)
+    return number_of_lines
+
+
 def yield_jsonl_slice(file_path: str, num_slices: int, slice_index: int) -> List[Dict]:
     # This is to avoid the excess memory requirement of reading the whole file first
     # and then slicing it.
     assert 0 <= slice_index <= num_slices-1
-    number_of_lines = (sum(1 for i in open(file_path)))
+    number_of_lines = get_file_num_lines(file_path)
     part_length = math.ceil(number_of_lines / num_slices)
     with open(file_path) as file:
         for index, line in enumerate(tqdm(file)):
             if not line.strip():
                 continue
+            if index < part_length*slice_index:
+                continue
+            if index > part_length*(slice_index+1):
+                break
             if (
                 (part_length*slice_index) <= index < part_length*(slice_index+1)
             ):
