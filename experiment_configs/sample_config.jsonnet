@@ -1,6 +1,6 @@
 {
-    "query_model": "facebook/dpr-question_encoder-single-nq-base",
-    "passage_model": "facebook/dpr-ctx_encoder-single-nq-base",
+    "query_model": "facebook/dpr-question_encoder-multiset-base",
+    "passage_model": "facebook/dpr-ctx_encoder-multiset-base",
     "data_dir": "processed_data/sample",
     "train_filename": "dpr_training_data.json",
     "dev_filename": "dpr_training_data.json",
