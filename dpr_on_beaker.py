@@ -148,7 +148,7 @@ def main():
             "train", pretrained_experiment_name
         )
         data_paths.append(f"result_of_{beaker_pretrained_experiment_name}")
-    data_paths = list(set(data_paths))
+    data_paths = list(set([e for e in data_paths if e.strip()]))
 
     haystack_wrapper_root = experiment_config.get("haystack_wrapper_root", ".")
 
