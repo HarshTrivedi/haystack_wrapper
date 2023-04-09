@@ -9,7 +9,7 @@ from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
 
-from lib import read_jsonl, yield_jsonl_slice, get_postgresql_address, get_milvus_address
+from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
 
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
@@ -61,6 +61,7 @@ def main():
     index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
+    print("Initializing MilvusDocumentStore.")
     document_store = MilvusDocumentStore(
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         host=milvus_host, port=milvus_port,
@@ -74,13 +75,13 @@ def main():
     if args.command == "create":
 
         for slice_index in range(index_num_chunks):
+            print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
             documents = [
                 document for document in yield_jsonl_slice(
                     index_data_path, index_num_chunks, slice_index
                 )
             ]
             num_documents = len(documents)
-            print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
             print(f"Number of documents: {num_documents}")
             print("Writing documents in MilvusDocumentStore.")
             document_store.write_documents(documents)
