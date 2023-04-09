@@ -25,7 +25,7 @@ def main():
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
-    parser.add_argument("prediction_file_path", type=str, help="prediction file path", required=False, default=None)
+    parser.add_argument("prediction_file_path", nargs="?", help="prediction file path", default=None)
     parser.add_argument("--num_documents", type=int, help="num_documents", default=10)
     parser.add_argument("--batch_size", type=int, help="batch_size", default=16)
     parser.add_argument("--query_field", type=str, help="query_field", default="question_text")
