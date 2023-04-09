@@ -160,7 +160,7 @@ def main():
         run_command = (
             f"python {haystack_wrapper_root}/predict_dpr.py "
             f"{args.experiment_name} {args.prediction_data_path} "
-            f"--output-directory beaker_output"
+            f"--output_directory beaker_output"
         )
     else:
         raise Exception(f"Unknown command {args.command}")
