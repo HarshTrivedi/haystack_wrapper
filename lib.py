@@ -43,7 +43,7 @@ def yield_jsonl(file_path: str, size: int):
 def get_file_num_lines(file_path: str) -> int:
     print(f"Counting num lines in {file_path}")
     with open(file_path) as file:
-        number_of_lines = sum(1 for i in file)
+        number_of_lines = sum(1 for i in tqdm(file))
     return number_of_lines
 
 
