@@ -1,5 +1,6 @@
 import os
 import json
+import math
 from typing import Dict, List, Union, Any
 
 
@@ -21,10 +22,28 @@ def write_jsonl(instances: List[Dict], file_path: str):
         for instance in instances:
             file.write(json.dumps(instance)+"\n")
 
+
+def yield_jsonl_slice(file_path: str, num_slices: int, slice_index: int) -> List[Dict]:
+    # This is to avoid the excess memory requirement of reading the whole file first
+    # and then slicing it.
+    assert 0 <= slice_index <= num_slices-1
+    number_of_lines = (sum(1 for i in open(file_path)))
+    part_length = math.ceil(number_of_lines / num_slices)
+    with open(file_path) as file:
+        for index, line in enumerate(file):
+            if not line.strip():
+                continue
+            if (
+                (part_length*slice_index) <= index < part_length*(slice_index+1)
+            ):
+                yield json.loads(line.strip())
+
+
 def is_directory_empty(directory: str) -> bool:
     if not os.path.exists(directory):
         return True
     return not os.listdir(directory)
+
 
 def flatten_dict(input_dict: Dict) -> Dict[str, Any]:
     """Returns allennlp-params-styled flat dict."""
