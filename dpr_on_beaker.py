@@ -113,9 +113,9 @@ def main():
 
     data_paths.append(experiment_config_file_path)
 
-    data_dir = experiment_config.get("data_dir")
-    train_filename = experiment_config.get("train_filename")
-    dev_filename = experiment_config.get("dev_filename")
+    data_dir = experiment_config.get("data_dir", "")
+    train_filename = experiment_config.get("train_filename", "")
+    dev_filename = experiment_config.get("dev_filename", "")
     train_data_path = os.path.join(data_dir, train_filename)
     validation_data_path = os.path.join(data_dir, dev_filename)
     index_data_path = experiment_config.pop("index_data_path")
