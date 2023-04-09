@@ -94,7 +94,8 @@ def main():
         "predict", description="Predict", help="Predict", parents=[allennlp_base_parser]
     )
     allennlp_predict_subparser.add_argument(
-        "prediction_data_path", type=str, help="data path to run prediction on."
+        "prediction_data_path", type=str, help="data path to run prediction on.",
+        required=False, default=None
     )
     args = allennlp_root_parser.parse_args()
 
@@ -127,6 +128,13 @@ def main():
 
     if args.command == "predict":
         data_paths.append(args.prediction_data_path)
+
+        if not args.prediction_data_path:
+            print("The prediction file path is not passed, defaulting to dev file_path from the config:")
+            args.prediction_data_path = os.path.join(
+                experiment_config["data_dir"], experiment_config["dev_filename"]
+            )
+            print(args.prediction_data_path)
 
     # Infer dependencies of pretrained experiment names
     pretrained_experiment_names = []
