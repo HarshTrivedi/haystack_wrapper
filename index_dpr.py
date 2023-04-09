@@ -84,13 +84,25 @@ def main():
         serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
         print("Loading DPR retriever models.")
-        retriever = DensePassageRetriever.load(
-            load_dir=serialization_dir, document_store=None, # No need to pass document_store here, pass at retrieval time.
-            query_encoder_dir="query_encoder",
-            passage_encoder_dir="passage_encoder",
-            max_seq_len_query=60,
-            max_seq_len_passage=440,
-        )
+        dont_train = experiment_config.pop("dont_train", False)
+        if dont_train:
+            query_model = experiment_config["query_model"]
+            passage_model = experiment_config["passage_model"]
+            retriever = DensePassageRetriever(
+                document_store=None,
+                query_embedding_model=query_model,
+                passage_embedding_model=passage_model,
+                max_seq_len_query=60,
+                max_seq_len_passage=440,
+            )
+        else:
+            retriever = DensePassageRetriever.load(
+                load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
+                query_encoder_dir="query_encoder",
+                passage_encoder_dir="passage_encoder",
+                max_seq_len_query=60,
+                max_seq_len_passage=440,
+            )
 
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
         # The data will be stored in milvus server (just like es).
