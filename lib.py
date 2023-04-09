@@ -2,6 +2,7 @@ import os
 import json
 import math
 from typing import Dict, List, Union, Any
+from tqdm import tqdm
 
 
 def read_json(file_path: str) -> Union[List, Dict]:
@@ -30,7 +31,7 @@ def yield_jsonl_slice(file_path: str, num_slices: int, slice_index: int) -> List
     number_of_lines = (sum(1 for i in open(file_path)))
     part_length = math.ceil(number_of_lines / num_slices)
     with open(file_path) as file:
-        for index, line in enumerate(file):
+        for index, line in enumerate(tqdm(file)):
             if not line.strip():
                 continue
             if (
