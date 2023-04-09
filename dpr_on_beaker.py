@@ -145,7 +145,8 @@ def main():
         if experiment_name_ is not None:
             pretrained_experiment_names.append(experiment_name_)
 
-    if args.command in ("index", "predict"):
+    dont_train = experiment_config.pop("dont_train", False)
+    if args.command in ("index", "predict") and not dont_train:
         # For indexing, the training must have already been finished,
         # which is necessary to be available.
         pretrained_experiment_names.append(args.experiment_name)
