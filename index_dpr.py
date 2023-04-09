@@ -4,6 +4,7 @@ import argparse
 import time
 
 import _jsonnet
+from tqdm import tqdm
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
@@ -66,7 +67,8 @@ def main():
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         host=milvus_host, port=milvus_port,
         index=index_name, index_type=index_type,
-        embedding_dim=768, id_field="id", embedding_field="embedding"
+        embedding_dim=768, id_field="id", embedding_field="embedding",
+        progress_bar=False
     )
 
     if args.command == "delete":
@@ -86,7 +88,8 @@ def main():
             num_documents = len(documents)
             print(f"Number of documents: {num_documents}")
             print("Writing documents in MilvusDocumentStore.")
-            document_store.write_documents(documents)
+            for document in tqdm(documents):
+                document_store.write_documents([documents])
 
         serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
