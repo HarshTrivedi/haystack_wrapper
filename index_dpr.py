@@ -9,7 +9,7 @@ from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
 
-from lib import read_jsonl, get_postgresql_address, get_milvus_address
+from lib import read_jsonl, yield_jsonl_slice, get_postgresql_address, get_milvus_address
 
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
@@ -40,6 +40,7 @@ def main():
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
     index_data_path = experiment_config.pop("index_data_path")
+    index_num_chunks = experiment_config.pop("index_num_chunks", 1)
 
     milvus_host, milvus_port = get_milvus_address()
 
@@ -72,14 +73,13 @@ def main():
 
     if args.command == "create":
 
-        print("Reading input documents.")
-        documents = read_jsonl(index_data_path)
-        num_documents = len(documents)
-        print(f"Number of input documents: {num_documents}")
-
-        print("Writing documents in MilvusDocumentStore.")
-        document_store.write_documents(documents)
-        # NOTE: I can iterate over the documents using get_all_documents_generator or get_all_documents functions.
+        for slice_index in range(index_num_chunks):
+            documents = yield_jsonl_slice(index_data_path, index_num_chunks, slice_index)
+            num_documents = len(documents)
+            print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
+            print(f"Number of documents: {num_documents}")
+            print("Writing documents in MilvusDocumentStore.")
+            document_store.write_documents(documents)
 
         serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
