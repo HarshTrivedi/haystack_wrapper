@@ -88,8 +88,8 @@ def main():
             num_documents = len(documents)
             print(f"Number of documents: {num_documents}")
             print("Writing documents in MilvusDocumentStore.")
-            for i in tqdm(range(0, len(documents), 100)):
-                document_store.write_documents(documents[i:i + 100])
+            for i in tqdm(range(0, len(documents), 10)):
+                document_store.write_documents(documents[i:i + 10])
 
         serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
