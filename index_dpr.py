@@ -26,7 +26,6 @@ def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
     parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
-    parser.add_argument("command", type=str, help="command", choices=("create", "delete"))
     parser.add_argument(
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
@@ -71,60 +70,58 @@ def main():
         progress_bar=False
     )
 
-    if args.command == "delete":
-        document_store.delete_index(index_name)
+    print(f"Deleting index {index_name} if it exists.")
+    document_store.delete_index(index_name)
 
-    if args.command == "create":
+    print("Loading DPR retriever models.")
+    serialization_dir = os.path.join("serialization_dir", args.experiment_name)
+    dont_train = experiment_config.pop("dont_train", False)
+    batch_size = experiment_config.pop("batch_size", 5120) # use 4X48Gs.
+    if dont_train:
+        query_model = experiment_config["query_model"]
+        passage_model = experiment_config["passage_model"]
+        retriever = DensePassageRetriever(
+            document_store=None,
+            query_embedding_model=query_model,
+            passage_embedding_model=passage_model,
+            max_seq_len_query=60,
+            max_seq_len_passage=440,
+            batch_size=batch_size,
+        )
+    else:
+        retriever = DensePassageRetriever.load(
+            load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
+            query_encoder_dir="query_encoder",
+            passage_encoder_dir="passage_encoder",
+            max_seq_len_query=60,
+            max_seq_len_passage=440,
+            batch_size=batch_size,
+        )
 
-        for slice_index in range(index_num_chunks):
-            print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
-            documents = []
-            for document in yield_jsonl_slice(
-                index_data_path, index_num_chunks, slice_index
-            ):
-                document["id"] = document["id"][-100:] # o/w raises error. The true ID will be in the metadata.
-                documents.append(document)
+    for slice_index in range(index_num_chunks):
 
-            num_documents = len(documents)
-            print(f"Number of documents: {num_documents}")
-            print("Writing documents in MilvusDocumentStore.")
-            for i in tqdm(range(0, len(documents), 10)):
-                document_store.write_documents(documents[i:i + 10])
+        print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
+        documents = []
+        for document in yield_jsonl_slice(
+            index_data_path, index_num_chunks, slice_index
+        ):
+            document["id"] = document["id"][-100:] # o/w raises error. The true ID will be in the metadata.
+            documents.append(document)
 
-        serialization_dir = os.path.join("serialization_dir", args.experiment_name)
-
-        print("Loading DPR retriever models.")
-        dont_train = experiment_config.pop("dont_train", False)
-        batch_size = experiment_config.pop("batch_size", 5120) # use 4X48Gs.
-        if dont_train:
-            query_model = experiment_config["query_model"]
-            passage_model = experiment_config["passage_model"]
-            retriever = DensePassageRetriever(
-                document_store=None,
-                query_embedding_model=query_model,
-                passage_embedding_model=passage_model,
-                max_seq_len_query=60,
-                max_seq_len_passage=440,
-                batch_size=batch_size,
-            )
-        else:
-            retriever = DensePassageRetriever.load(
-                load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
-                query_encoder_dir="query_encoder",
-                passage_encoder_dir="passage_encoder",
-                max_seq_len_query=60,
-                max_seq_len_passage=440,
-                batch_size=batch_size,
-            )
+        num_documents = len(documents)
+        print(f"Number of documents: {num_documents}")
+        print("Writing documents in MilvusDocumentStore.")
+        for i in tqdm(range(0, len(documents), 10)):
+            document_store.write_documents(documents[i:i + 10])
 
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
         # The data will be stored in milvus server (just like es).
         document_store.update_embeddings(
-            retriever, batch_size=10_000, update_existing_embeddings=True,
+            retriever, batch_size=10_000, update_existing_embeddings=False,
         )
         time.sleep(2) # needs some time to update num_entites
         number_of_documents = document_store.get_embedding_count()
-        print(f"Number of indexed documents: {number_of_documents}")
+        print(f"Number of total indexed documents so far: {number_of_documents}")
 
 
 if __name__ == "__main__":
