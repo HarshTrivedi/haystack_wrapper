@@ -4,6 +4,7 @@ import argparse
 import time
 
 import _jsonnet
+from tqdm import tqdm
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
@@ -87,7 +88,7 @@ def main():
             num_documents = len(documents)
             print(f"Number of documents: {num_documents}")
             print("Writing documents in MilvusDocumentStore.")
-            for i in range(0, len(documents), 100):
+            for i in tqdm(range(0, len(documents), 100)):
                 document_store.write_documents(documents[i:i + 100])
 
         serialization_dir = os.path.join("serialization_dir", args.experiment_name)
