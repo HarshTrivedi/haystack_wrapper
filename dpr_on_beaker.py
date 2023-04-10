@@ -163,7 +163,7 @@ def main():
     if args.command == "train":
         run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --force"
     elif args.command == "index":
-        run_command = f"python {haystack_wrapper_root}/index_dpr.py create {args.experiment_name}"
+        run_command = f"python {haystack_wrapper_root}/index_dpr.py {args.experiment_name}"
     elif args.command == "predict":
         run_command = (
             f"python {haystack_wrapper_root}/predict_dpr.py "
