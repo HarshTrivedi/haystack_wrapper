@@ -4,7 +4,6 @@ import argparse
 import time
 
 import _jsonnet
-from tqdm import tqdm
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
@@ -88,13 +87,14 @@ def main():
             num_documents = len(documents)
             print(f"Number of documents: {num_documents}")
             print("Writing documents in MilvusDocumentStore.")
-            for document in tqdm(documents):
-                document_store.write_documents([documents])
+            for i in range(0, len(documents), 100):
+                document_store.write_documents(documents[i:i + 100])
 
         serialization_dir = os.path.join("serialization_dir", args.experiment_name)
 
         print("Loading DPR retriever models.")
         dont_train = experiment_config.pop("dont_train", False)
+        batch_size = experiment_config.pop("batch_size", 5120) # use 4X48Gs.
         if dont_train:
             query_model = experiment_config["query_model"]
             passage_model = experiment_config["passage_model"]
@@ -104,6 +104,7 @@ def main():
                 passage_embedding_model=passage_model,
                 max_seq_len_query=60,
                 max_seq_len_passage=440,
+                batch_size=batch_size,
             )
         else:
             retriever = DensePassageRetriever.load(
@@ -112,6 +113,7 @@ def main():
                 passage_encoder_dir="passage_encoder",
                 max_seq_len_query=60,
                 max_seq_len_passage=440,
+                batch_size=batch_size,
             )
 
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
