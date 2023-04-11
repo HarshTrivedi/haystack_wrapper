@@ -4,7 +4,7 @@ import argparse
 import time
 
 import _jsonnet
-from tqdm import tqdm
+from progressbar import progressbar
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import MilvusDocumentStore
@@ -111,8 +111,11 @@ def main():
         num_documents = len(documents)
         print(f"Number of documents: {num_documents}")
         print("Writing documents in MilvusDocumentStore.")
-        for i in tqdm(range(0, len(documents), 10)):
-            document_store.write_documents(documents[i:i + 10])
+        for i in progressbar(range(0, len(documents), 10)):
+            document_store.write_documents(documents[i:i + 10], duplicate_documents="skip")
+
+        number_of_documents = document_store.get_document_count()
+        print(f"Number of total documents with or without embeddings so far: {number_of_documents}")
 
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
         # The data will be stored in milvus server (just like es).
@@ -121,7 +124,7 @@ def main():
         )
         time.sleep(2) # needs some time to update num_entites
         number_of_documents = document_store.get_embedding_count()
-        print(f"Number of total indexed documents so far: {number_of_documents}")
+        print(f"Number of total documents with embeddings so far: {number_of_documents}")
 
 
 if __name__ == "__main__":
