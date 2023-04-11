@@ -11,15 +11,8 @@ from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
 
 from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
+from index_dpr import get_index_name
 
-
-def get_index_name(experiment_name: str, index_data_path: str) -> str:
-    data_name = os.path.splitext(
-        index_data_path
-    )[0].replace("processed_data/", "").replace("/", "__")
-
-    index_name = "___".join([experiment_name, data_name])
-    return index_name
 
 
 def main():
