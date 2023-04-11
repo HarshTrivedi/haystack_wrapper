@@ -137,7 +137,7 @@ def main():
             documents.append(document)
 
         num_documents = len(documents)
-        print(f"Number of documents: {num_documents}")
+        print(f"Number of documents in this slice: {num_documents}")
         print("Writing documents in MilvusDocumentStore.")
         for i in progressbar(range(0, len(documents), 10)):
             document_store.write_documents(documents[i:i + 10], duplicate_documents="skip")
