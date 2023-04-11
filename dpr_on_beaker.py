@@ -220,7 +220,7 @@ def main():
         "docker_filepath": dockerfile_file_path,
         "local_output_directory": local_output_directory,
         "beaker_output_directory": beaker_output_directory,
-        "gpu_count": 1,
+        "gpu_count": 4 if args.command == "index" else 1,
         "cpu_count": 15,
         "memory": "16GiB",
         "parallel_run_count": 1,
