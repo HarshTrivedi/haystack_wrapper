@@ -22,6 +22,24 @@ def get_index_name(experiment_name: str, index_data_path: str) -> str:
     return index_name
 
 
+def build_document_store(
+    postgresql_host: str,
+    postgresql_port: str,
+    milvus_host: str,
+    milvus_port: str,
+    index_name: str,
+    index_type: str
+):
+    document_store = MilvusDocumentStore(
+        sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
+        host=milvus_host, port=milvus_port,
+        index=index_name, index_type=index_type,
+        embedding_dim=768, id_field="id", embedding_field="embedding",
+        progress_bar=False
+    )
+    return document_store
+
+
 def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
@@ -63,12 +81,11 @@ def main():
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
     print("Initializing MilvusDocumentStore.")
-    document_store = MilvusDocumentStore(
-        sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
-        host=milvus_host, port=milvus_port,
-        index=index_name, index_type=index_type,
-        embedding_dim=768, id_field="id", embedding_field="embedding",
-        progress_bar=False
+
+    document_store = build_document_store(
+        postgresql_host, postgresql_port,
+        milvus_host, milvus_port,
+        index_name, index_type
     )
 
     print(f"Index name: {index_name}")
@@ -76,6 +93,13 @@ def main():
 
     print(f"Deleting index {index_name} if it exists.")
     document_store.delete_index(index_name)
+
+    # it needs to be reinstantiated after deleting the index.
+    document_store = build_document_store(
+        postgresql_host, postgresql_port,
+        milvus_host, milvus_port,
+        index_name, index_type
+    )
 
     print("Loading DPR retriever models.")
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
