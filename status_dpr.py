@@ -48,8 +48,6 @@ def main():
     print("Milvus collections stats:")
     print(json.dumps(collection_name_to_sizes, indent=4))
 
-    print(f"Index name: {index_name}")
-
     print("Building MilvusDocumentStore.")
 
     postgresql_host, postgresql_port = get_postgresql_address()
@@ -57,6 +55,10 @@ def main():
     index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
+
+    print(f"Index name: {index_name}")
+    print(f"Index type: {index_type}")
+
     print("Initializing MilvusDocumentStore.")
     document_store = MilvusDocumentStore(
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
