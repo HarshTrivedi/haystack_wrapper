@@ -48,6 +48,8 @@ def main():
     print("Milvus collections stats:")
     print(json.dumps(collection_name_to_sizes, indent=4))
 
+    print(f"Index name: {index_name}")
+
     print("Building MilvusDocumentStore.")
 
     postgresql_host, postgresql_port = get_postgresql_address()
