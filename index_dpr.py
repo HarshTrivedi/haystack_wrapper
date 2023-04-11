@@ -71,6 +71,9 @@ def main():
         progress_bar=False
     )
 
+    print(f"Index name: {index_name}")
+    print(f"Index type: {index_type}")
+
     print(f"Deleting index {index_name} if it exists.")
     document_store.delete_index(index_name)
 
