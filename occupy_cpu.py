@@ -6,7 +6,7 @@ def main():
         x = 1
         y = 2
         z = x + y
-        time.sleep(0.1)
+        time.sleep(0.2)
 
 
 if __name__ == '__main__':
