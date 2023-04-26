@@ -49,6 +49,7 @@ nohup beaker session create \
                 command = f"beaker session stop {session_name}"
             print(f"Running: {command}")
             subprocess.run(command, shell=True)
+            os.remove(nohup_file_path)
         else:
             print("No nohup file found to obtain the running session.")
 
