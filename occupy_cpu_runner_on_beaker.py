@@ -10,6 +10,7 @@ def main():
         description="Start a simple process on beaker that keeps it occupied."
     )
     parser.add_argument("--force", action="store_true", help="delete the image if it already exists.")
+    args = parser.parse_args()
 
     image_name = "occupy_cpu"
     docker_file_name = "occupy_cpu.dockerfile"
