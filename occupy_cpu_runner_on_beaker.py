@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import json
-import argparse
 import subprocess
 
 
@@ -49,13 +48,6 @@ def make_image(update_if_exists: bool = False):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Do start/stop empty placeholder process for Milvus servers on Beaker interactive session."
-    )
-    parser.add_argument(
-        "command", type=str, help="command", choices=("start", "stop")
-    )
-    args = parser.parse_args()
 
     make_image()
     print("Done with potential image creation.")
