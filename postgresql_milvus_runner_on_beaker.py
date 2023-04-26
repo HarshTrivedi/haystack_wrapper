@@ -35,18 +35,26 @@ beaker session create \
         print(f"Running: {command}")
         subprocess.run(command, shell=True)
 
+        command = "./occupy_cpu_runner_on_beaker.py start"
+        print("Running: " + command)
+        subprocess.run(command, shell=True)
+
     if args.command == "stop":
         assert not args.force, "--force is meaningless for stop command."
         command = (
             "docker rm -f postgres -f milvus-standalone -f milvus-minio -f milvus-etcd"
         )
-        print(command)
+        print("Running: " + command)
+        subprocess.run(command, shell=True)
+
+        command = "./occupy_cpu_runner_on_beaker.py stop"
+        print("Running: " + command)
         subprocess.run(command, shell=True)
 
     if args.command == "status":
         assert not args.force, "--force is meaningless for status command."
         command = "docker ps -a"
-        print(command)
+        print("Running: " + command)
         subprocess.run(command, shell=True)
 
 
