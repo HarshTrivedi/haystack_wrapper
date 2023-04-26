@@ -2,6 +2,7 @@ import time
 
 
 def main():
+    print("Starting a process to keep one CPU occupied.")
     while True:
         x = 1
         y = 2
