@@ -104,7 +104,7 @@ def main():
     print("Loading DPR retriever models.")
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
     dont_train = experiment_config.pop("dont_train", False)
-    batch_size = experiment_config.pop("batch_size", 5120) # use 4X48Gs.
+    batch_size = experiment_config.pop("index_batch_size", 5120) # use 4X48Gs.
     if dont_train:
         query_model = experiment_config["query_model"]
         passage_model = experiment_config["passage_model"]

@@ -64,6 +64,9 @@ def main():
 
     experiment_config.pop("index_type") # not used here, it's only used at index generation time.
 
+    experiment_config["batch_size"] = experiment_config.pop("train_batch_size", None)
+    experiment_config.pop("index_batch_size", None)
+    experiment_config.pop("predict_batch_size", None)
     haystack_args = haystack_parser.parse_dict(experiment_config)
 
     retriever = DensePassageRetriever(

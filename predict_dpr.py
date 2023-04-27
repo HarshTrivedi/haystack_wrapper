@@ -37,7 +37,7 @@ def main():
         exit(f"Experiment config file_path {experiment_config_file_path} not found.")
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
-    batch_size = experiment_config.get("batch_size", args.batch_size)
+    batch_size = experiment_config.get("predict_batch_size", args.batch_size)
 
     index_data_path = experiment_config.pop("index_data_path")
     index_name = get_index_name(args.experiment_name, index_data_path)
