@@ -16,9 +16,11 @@ from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
     data_name = os.path.splitext(
         index_data_path
-    )[0].replace("processed_data/", "").replace("/", "__")
-
+    )[0].replace("processed_datasets/", "").replace("processed_data/", "").replace("/", "__")
     index_name = "___".join([experiment_name, data_name])
+    if len(index_name) >= 100:
+        # without this I am not able to make insertions
+        index_name = index_name[-100:]
     return index_name
 
 
