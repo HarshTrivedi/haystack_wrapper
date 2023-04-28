@@ -53,7 +53,7 @@ def main():
         else:
             container_ids = [
                 line.split()[0] for line in docker_process_logs.split("\n")
-                if "local 5432" in line
+                if "local 25432" in line
             ]
             print("Docker bore processes running for postgresql:")
             print("\n".join(container_ids))
@@ -64,7 +64,7 @@ def main():
                     subprocess.call(command, shell=True)
 
     if args.expose and args.command in ("start"):
-        command = "sudo docker run -d -it --init --rm --network host ekzhang/bore local 5432 --to bore.pub"
+        command = "sudo docker run -d -it --init --rm --network host ekzhang/bore local 25432 --to bore.pub"
         result = subprocess.run(command.split(), stdout=subprocess.PIPE)
         container_id = result.stdout.decode("utf-8").strip()
         if len(container_id) != 64:
