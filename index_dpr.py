@@ -37,7 +37,7 @@ def build_document_store(
         host=milvus_host, port=milvus_port,
         index=index_name, index_type=index_type,
         embedding_dim=768, id_field="id", embedding_field="embedding",
-        progress_bar=False
+        progress_bar=True
     )
     return document_store
 
@@ -130,12 +130,24 @@ def main():
 
     for slice_index in range(index_num_chunks):
 
-        print(f"Reading input documents slice {slice_index+1}/{index_num_chunks}.")
+        print(f"\n\nReading input documents slice {slice_index+1}/{index_num_chunks}.")
         documents = []
+        document_store.progress_bar = False
         for document in yield_jsonl_slice(
             index_data_path, index_num_chunks, slice_index
         ):
-            document["id"] = document["id"][-100:] # o/w raises error. The true ID will be in the metadata.
+            true_document_id = document["meta"].pop("id")
+            document["id"] = true_document_id[-100:] # o/w raises error. The true ID will be in the metadata.
+            document["meta"]["id_prefix"] = true_document_id.replace(document["id"], "")
+            assert true_document_id == document["meta"]["id_prefix"] + document["id"]
+            document["meta"] = {
+                # don't add anything else, as it's unnecessary and causes length problems.
+                "id_prefix": document["meta"]["id_prefix"],
+                "section_index": document["meta"]["section_index"],
+                "document_type": document["meta"]["document_type"],
+                "document_index": document["meta"]["document_index"],
+                "document_sub_index": document["meta"]["document_sub_index"],
+            }
             documents.append(document)
 
         num_documents = len(documents)
@@ -149,6 +161,7 @@ def main():
 
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
         # The data will be stored in milvus server (just like es).
+        document_store.progress_bar = True
         document_store.update_embeddings(
             retriever, batch_size=10_000, update_existing_embeddings=False,
         )
