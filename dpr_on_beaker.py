@@ -75,7 +75,7 @@ def main():
     )
     allennlp_base_parser.add_argument(
         "--cluster", type=str,
-        choices=["general", "aristo", "allennlp", "mosaic", "s2", "safe_a1000s"],
+        choices=["general", "aristo", "allennlp", "mosaic", "s2", "safe_a1000s", "general-a100"],
         default="safe_a1000s"
     )
     allennlp_base_parser.add_argument(
