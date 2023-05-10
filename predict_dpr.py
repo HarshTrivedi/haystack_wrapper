@@ -83,11 +83,13 @@ def main():
             max_seq_len_passage=440,
             progress_bar=True,
         )
-    
+
     prediction_instances = read_jsonl(args.prediction_file_path)
 
     queries = [instance[args.query_field] for instance in prediction_instances]
     document_store.progress_bar = True
+    import haystack_monkeypatch
+    retriever.retrieve_batch = haystack_monkeypatch.retrieve_batch
     retrieval_results = retriever.retrieve_batch(
         queries=queries,
         top_k=args.num_documents,
