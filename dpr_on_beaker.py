@@ -96,6 +96,7 @@ def main():
     allennlp_predict_subparser.add_argument(
         "prediction_file_path", nargs="?", help="data path to run prediction on.", default=None
     )
+    allennlp_predict_subparser.add_argument("--batch_size", type=int, help="batch_size", default=256)
     args = allennlp_root_parser.parse_args()
 
     if not args.command:
@@ -170,6 +171,8 @@ def main():
             f"{args.experiment_name} {args.prediction_file_path} "
             f"--output_directory beaker_output"
         )
+        if args.batch_size:
+            run_command += f" --batch_size {args.batch_size}"
     else:
         raise Exception(f"Unknown command {args.command}")
 
