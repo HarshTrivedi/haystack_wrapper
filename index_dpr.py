@@ -51,6 +51,7 @@ def main():
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
+    parser.add_argument("--delete_if_exists", action="store_true", default=False, help="delete index if it exists.")
     args = parser.parse_args()
     load_dotenv()
 
@@ -94,15 +95,16 @@ def main():
     print(f"Index name: {index_name}")
     print(f"Index type: {index_type}")
 
-    print(f"Deleting index {index_name} if it exists.")
-    document_store.delete_index(index_name)
+    if args.delete_if_exists:
+        print(f"Deleting index {index_name} if it exists.")
+        document_store.delete_index(index_name)
 
-    # it needs to be reinstantiated after deleting the index.
-    document_store = build_document_store(
-        postgresql_host, postgresql_port,
-        milvus_host, milvus_port,
-        index_name, index_type
-    )
+        # it needs to be reinstantiated after deleting the index.
+        document_store = build_document_store(
+            postgresql_host, postgresql_port,
+            milvus_host, milvus_port,
+            index_name, index_type
+        )
 
     print("Loading DPR retriever models.")
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
