@@ -1,6 +1,7 @@
 # Monkey Patch to fix the progressbar in haystack prediction for farm-haystack[milvus]==v1.15.0
 
 from tqdm.auto import tqdm
+import types
 from typing import Optional, Dict, List, Union, Any
 
 import numpy as np
@@ -81,6 +82,7 @@ def retrieve_batch(
 
     # NOTE(Harsh): The next 2 lines and the two prints below is the reason for monkey patch.
     maybe_tqdm = tqdm if self.progress_bar else lambda e: e
+    document_store.query_by_embedding_batch = types.MethodType(query_by_embedding_batch, document_store)
     print("Building query vectors...")
     for batch in maybe_tqdm(self._get_batches(queries=queries, batch_size=batch_size)):
         query_embs.extend(self.embed_queries(queries=batch))
@@ -149,6 +151,5 @@ def _get_predictions(self, dicts: List[Dict[str, Any]]) -> Dict[str, np.ndarray]
 
 
 def monkeypath_retriever(retriever: DensePassageRetriever):
-    import types
     retriever.retrieve_batch = types.MethodType(retrieve_batch, retriever)
     retriever._get_predictions = types.MethodType(_get_predictions, retriever)
