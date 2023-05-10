@@ -79,7 +79,7 @@ def main():
         default="safe_a1000s"
     )
     allennlp_base_parser.add_argument(
-        "--copy-url", action="store_true", help="don't run, just copy beaker URL."
+        "--copy_url", action="store_true", help="don't run, just copy beaker URL."
     )
     allennlp_base_parser.add_argument(
         "--preemptible", action="store_true", help="run on beaker with preemptible priority."
@@ -89,6 +89,9 @@ def main():
     )
     allennlp_index_subparser = allennlp_subparsers.add_parser(
         "index", description="Index", help="Index", parents=[allennlp_base_parser]
+    )
+    allennlp_index_subparser.add_argument(
+        "--delete_if_exists", action="store_true", help="delete index if it exists."
     )
     allennlp_predict_subparser = allennlp_subparsers.add_parser(
         "predict", description="Predict", help="Predict", parents=[allennlp_base_parser]
