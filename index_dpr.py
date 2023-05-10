@@ -11,6 +11,7 @@ from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
 
 from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
+from haystack_monkeypatch import monkeypath_retriever
 
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
@@ -127,6 +128,7 @@ def main():
             max_seq_len_passage=440,
             batch_size=batch_size,
         )
+    monkeypath_retriever(retriever)
 
     for slice_index in range(index_num_chunks):
 
