@@ -169,7 +169,7 @@ def main():
     elif args.command == "index":
         run_command = f"python {haystack_wrapper_root}/index_dpr.py {args.experiment_name}"
         if args.delete_if_exists:
-            run_command += f" --delete_if_exists {delete_if_exists}"
+            run_command += f" --delete_if_exists"
     elif args.command == "predict":
         run_command = (
             f"python {haystack_wrapper_root}/predict_dpr.py "
