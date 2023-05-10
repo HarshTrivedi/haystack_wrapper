@@ -1,6 +1,6 @@
 # Monkey Patch to fix the progressbar in haystack prediction for farm-haystack[milvus]==v1.15.0
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from typing import Optional, Dict, List, Union, Any
 
 import numpy as np
@@ -11,6 +11,7 @@ from haystack.schema import Document, FilterType
 from haystack.errors import HaystackError
 from haystack.document_stores import BaseDocumentStore
 from haystack.modeling.data_handler.dataloader import NamedDataLoader
+from haystack.nodes import DensePassageRetriever
 
 
 def query_by_embedding_batch(
@@ -32,9 +33,8 @@ def query_by_embedding_batch(
     else:
         filters = [filters] * len(query_embs)
     results = []
-    # NOTE(Harsh): The next 2 lines is the reason for monkey patch.
-    from tqdm import tqdm
-    for query_emb, filter in tqdm(zip(query_embs, filters)):
+    # NOTE(Harsh): The next 1 line is the reason for monkey patch.
+    for query_emb, filter in tqdm(list(zip(query_embs, filters))):
         results.append(
             self.query_by_embedding(
                 query_emb=query_emb,
@@ -47,8 +47,6 @@ def query_by_embedding_batch(
             )
         )
     return results
-
-BaseDocumentStore.query_by_embedding_batch = query_by_embedding_batch
 
 
 def retrieve_batch(
@@ -81,19 +79,17 @@ def retrieve_batch(
 
     query_embs: List[np.ndarray] = []
 
-    # NOTE(Harsh): The next 3 lines is the reason for monkey patch.
-    from tqdm import tqdm
+    # NOTE(Harsh): The next 2 lines and the two prints below is the reason for monkey patch.
     maybe_tqdm = tqdm if self.progress_bar else lambda e: e
+    print("Building query vectors...")
     for batch in maybe_tqdm(self._get_batches(queries=queries, batch_size=batch_size)):
         query_embs.extend(self.embed_queries(queries=batch))
+    print("Performing retrieval with query vectors...")
     documents = document_store.query_by_embedding_batch(
         query_embs=query_embs, top_k=top_k, filters=filters, index=index, headers=headers, scale_score=scale_score
     )
 
     return documents
-
-from haystack.nodes import DensePassageRetriever
-DensePassageRetriever.retrieve_batch = retrieve_batch
 
 
 def _get_predictions(self, dicts: List[Dict[str, Any]]) -> Dict[str, np.ndarray]:
@@ -151,4 +147,8 @@ def _get_predictions(self, dicts: List[Dict[str, Any]]) -> Dict[str, np.ndarray]
         all_embeddings["query"] = np.concatenate(query_embeddings_batched)
     return all_embeddings
 
-DensePassageRetriever._get_predictions = _get_predictions
+
+def monkeypath_retriever(retriever: DensePassageRetriever):
+    import types
+    retriever.retrieve_batch = types.MethodType(retrieve_batch, retriever)
+    retriever._get_predictions = types.MethodType(_get_predictions, retriever)

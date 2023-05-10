@@ -10,6 +10,7 @@ from pymilvus import connections
 
 from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
 from index_dpr import get_index_name
+from haystack_monkeypatch import monkeypath_retriever
 
 
 def main():
@@ -83,16 +84,12 @@ def main():
             max_seq_len_passage=440,
             progress_bar=True,
         )
+    monkeypath_retriever(retriever)
 
     prediction_instances = read_jsonl(args.prediction_file_path)
 
     queries = [instance[args.query_field] for instance in prediction_instances]
     document_store.progress_bar = True
-    import haystack_monkeypatch
-    import types
-    retriever.retrieve_batch = types.MethodType(haystack_monkeypatch.retrieve_batch, retriever)
-    retriever._get_predictions = types.MethodType(haystack_monkeypatch._get_predictions, retriever)
-
     retrieval_results = retriever.retrieve_batch(
         queries=queries,
         top_k=args.num_documents,
