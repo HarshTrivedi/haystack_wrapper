@@ -72,6 +72,7 @@ def main():
             passage_embedding_model=passage_model,
             max_seq_len_query=60,
             max_seq_len_passage=440,
+            progress_bar=True,
         )
     else:
         retriever = DensePassageRetriever.load(
@@ -80,11 +81,13 @@ def main():
             passage_encoder_dir="passage_encoder",
             max_seq_len_query=60,
             max_seq_len_passage=440,
+            progress_bar=True,
         )
     
     prediction_instances = read_jsonl(args.prediction_file_path)
 
     queries = [instance[args.query_field] for instance in prediction_instances]
+    document_store.progress_bar = True
     retrieval_results = retriever.retrieve_batch(
         queries=queries,
         top_k=args.num_documents,
@@ -97,10 +100,12 @@ def main():
         retrieved_documents_stripped = []
         for retrieved_document in retrieved_documents:
             retrieved_document_ = retrieved_document.to_dict()
-            # it has other potentially useful details, but not needed for now.
+            id_ = retrieved_document_["meta"].pop("id_prefix") + retrieved_document_["id"]
+            retrieved_document_["meta"].pop("vector_id")
             retrieved_document_stripped = {
+                "id": id_,
                 "content": retrieved_document_["content"],
-                "title": retrieved_document_["meta"]["title"],
+                "metadata": retrieved_document_["meta"],
                 "score": retrieved_document_["score"],
             }
             retrieved_documents_stripped.append(retrieved_document_stripped)

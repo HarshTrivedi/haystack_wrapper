@@ -94,7 +94,7 @@ def main():
         "predict", description="Predict", help="Predict", parents=[allennlp_base_parser]
     )
     allennlp_predict_subparser.add_argument(
-        "prediction_data_path", nargs="?", help="data path to run prediction on.", default=None
+        "prediction_file_path", nargs="?", help="data path to run prediction on.", default=None
     )
     args = allennlp_root_parser.parse_args()
 
@@ -126,14 +126,14 @@ def main():
         data_paths.append(index_data_path)
 
     if args.command == "predict":
-        data_paths.append(args.prediction_data_path)
+        data_paths.append(args.prediction_file_path)
 
-        if not args.prediction_data_path:
+        if not args.prediction_file_path:
             print("The prediction file path is not passed, defaulting to dev file_path from the config:")
-            args.prediction_data_path = os.path.join(
+            args.prediction_file_path = os.path.join(
                 experiment_config["data_dir"], experiment_config["dev_filename"]
             )
-            print(args.prediction_data_path)
+            print(args.prediction_file_path)
 
     # Infer dependencies of pretrained experiment names
     pretrained_experiment_names = []
@@ -167,7 +167,7 @@ def main():
     elif args.command == "predict":
         run_command = (
             f"python {haystack_wrapper_root}/predict_dpr.py "
-            f"{args.experiment_name} {args.prediction_data_path} "
+            f"{args.experiment_name} {args.prediction_file_path} "
             f"--output_directory beaker_output"
         )
     else:
@@ -230,8 +230,8 @@ def main():
     }
 
     data_path = ""
-    if hasattr(args, "prediction_data_path"):
-        data_path = args.prediction_data_path
+    if hasattr(args, "prediction_file_path"):
+        data_path = args.prediction_file_path
 
     beaker_experiment_name = get_run_name(args.command, args.experiment_name, data_path)
     beakerizer_config_file_path = os.path.join(
