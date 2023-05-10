@@ -4,6 +4,7 @@ WORKDIR /run/
 
 COPY run_name.py run_name.py
 COPY lib.py lib.py
+COPY haystack_monkeypatch.py haystack_monkeypatch.py
 COPY train_dpr.py train_dpr.py
 COPY index_dpr.py index_dpr.py
 COPY predict_dpr.py predict_dpr.py
