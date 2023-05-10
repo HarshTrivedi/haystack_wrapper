@@ -89,7 +89,10 @@ def main():
     queries = [instance[args.query_field] for instance in prediction_instances]
     document_store.progress_bar = True
     import haystack_monkeypatch
-    retriever.retrieve_batch = haystack_monkeypatch.retrieve_batch
+    import types
+    retriever.retrieve_batch = types.MethodType(haystack_monkeypatch.retrieve_batch, retriever)
+    retriever._get_predictions = types.MethodType(haystack_monkeypatch._get_predictions, retriever)
+
     retrieval_results = retriever.retrieve_batch(
         queries=queries,
         top_k=args.num_documents,
