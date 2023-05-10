@@ -164,6 +164,12 @@ def main():
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
         # The data will be stored in milvus server (just like es).
         document_store.progress_bar = True
+        # There are 2 batch_sizes here. The one passed in update_embeddings is the top level
+        # processing batch size. So if you have 1M docs, and it's 10K, they'll be chunked in batches
+        # of that size. This is for putting things in sql and so on. Within that chunk there is
+        # another batch size that's configured by the jsonnet config parameter, which is the batch size
+        # for the forward of of the retriever model. There's is not much value in increasing update_embeddings
+        # to more than 10K, it has not effect on the GPU memory usage.
         document_store.update_embeddings(
             retriever, batch_size=10_000, update_existing_embeddings=False,
         )
