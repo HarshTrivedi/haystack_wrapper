@@ -46,9 +46,9 @@ class FaissDocumentStoreManager:
         index_full_name = "__".join([index_name.lower(), index_type.lower()])
         index_full_directory = os.path.join(faiss_data_directory, index_full_name)
 
-        self.index_sql_path = os.path.join(index_full_directory, index_full_name, "index.db")
-        self.index_faiss_path = os.path.join(index_full_directory, index_full_name, "index.faiss")
-        self.index_json_path = os.path.join(index_full_directory, index_full_name, "index.json")
+        self.index_sql_path = os.path.join(index_full_directory, "index.db")
+        self.index_faiss_path = os.path.join(index_full_directory, "index.faiss")
+        self.index_json_path = os.path.join(index_full_directory, "index.json")
 
         os.makedirs(index_full_directory, exist_ok=True)
 
