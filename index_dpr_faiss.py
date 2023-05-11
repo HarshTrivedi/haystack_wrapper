@@ -60,6 +60,7 @@ class FaissDocumentStoreManager:
             os.path.exists(self.index_json_path)
         )
         if delete_if_exists and index_exists:
+            shutil.rmtree(self.index_sql_path, ignore_errors=True)
             shutil.rmtree(self.index_faiss_path, ignore_errors=True)
             shutil.rmtree(self.index_json_path, ignore_errors=True)
 
