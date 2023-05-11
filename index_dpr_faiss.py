@@ -54,15 +54,16 @@ class FaissDocumentStoreManager:
 
     def load(self, delete_if_exists: bool):
 
+        if delete_if_exists:
+            shutil.rmtree(os.path.dirname(self.index_sql_path), ignore_errors=True)
+
         index_exists = (
             os.path.exists(self.index_sql_path) and
             os.path.exists(self.index_faiss_path) and
             os.path.exists(self.index_json_path)
         )
-        if delete_if_exists and index_exists:
-            shutil.rmtree(os.path.dirname(self.index_sql_path), ignore_errors=True)
 
-        if index_exists and not delete_if_exists:
+        if index_exists:
             document_store = FAISSDocumentStore(
                 sql_url="sqlite:///"+self.index_sql_path,
                 faiss_index_path=self.index_faiss_path,
