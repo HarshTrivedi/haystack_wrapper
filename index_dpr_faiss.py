@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import FAISSDocumentStore
 
+from lib import yield_jsonl_slice
 from haystack_monkeypatch import monkeypath_retriever
 
 
@@ -26,6 +27,7 @@ class FaissDocumentStoreManager:
 
         self.experiment_name = experiment_name
         self.index_data_path = index_data_path
+        self.index_type = index_type
 
         data_name = os.path.splitext(
             index_data_path
@@ -41,11 +43,12 @@ class FaissDocumentStoreManager:
 
         assert os.path.exists(faiss_data_directory) and os.path.isdir(faiss_data_directory)
 
-        index_full_name = "__".join(index_name.lower(), index_type.lower())
+        index_full_name = "__".join([index_name.lower(), index_type.lower()])
         index_full_directory = os.path.join(faiss_data_directory, index_full_name)
 
-        self.index_faiss_path = os.path.join(index_full_directory, index_full_name, + "index.faiss")
-        self.index_json_path = os.path.join(index_full_directory, index_full_name, + "index.json")
+        self.index_sql_path = os.path.join(index_full_directory, index_full_name, "index.db")
+        self.index_faiss_path = os.path.join(index_full_directory, index_full_name, "index.faiss")
+        self.index_json_path = os.path.join(index_full_directory, index_full_name, "index.json")
 
     def load(self, delete_if_exists: bool):
 
@@ -55,11 +58,16 @@ class FaissDocumentStoreManager:
             shutil.rmtree(self.index_json_path, ignore_errors=True)
 
         if index_exists:
-            document_store = FAISSDocumentStore.load(
+            document_store = FAISSDocumentStore(
+                sql_url= "sqlite:///" + self.index_sql_path,
                 index_path=self.index_faiss_path, config_path=self.index_json_path
             )
         else:
-            document_store = FAISSDocumentStore(faiss_index_factory_str=self.index_type)
+            document_store = FAISSDocumentStore(
+                sql_url= "sqlite:///" + self.index_sql_path,
+                faiss_index_factory_str=self.index_type
+            )
+            assert document_store.faiss_index_factory_str == self.index_type
 
         return document_store
 
@@ -93,12 +101,12 @@ def main():
 
     document_store_manager = FaissDocumentStoreManager(        
         args.experiment_name,
-        args.index_data_path,
-        args.index_type,
+        index_data_path,
+        index_type,
     )
 
     print("Loading or building Document Store (Index)")
-    document_store = document_store_manager.load()
+    document_store = document_store_manager.load(delete_if_exists=args.delete_if_exists)
 
     print("Loading DPR retriever models.")
     serialization_dir = os.path.join("serialization_dir", args.experiment_name)
