@@ -50,21 +50,27 @@ class FaissDocumentStoreManager:
         self.index_faiss_path = os.path.join(index_full_directory, index_full_name, "index.faiss")
         self.index_json_path = os.path.join(index_full_directory, index_full_name, "index.json")
 
+        os.makedirs(index_full_directory, exist_ok=True)
+
     def load(self, delete_if_exists: bool):
 
-        index_exists = os.path.exists(self.index_faiss_path) and os.path.exists(self.index_json_path)
+        index_exists = (
+            os.path.exists(self.index_sql_path) and
+            os.path.exists(self.index_faiss_path) and
+            os.path.exists(self.index_json_path)
+        )
         if delete_if_exists and index_exists:
             shutil.rmtree(self.index_faiss_path, ignore_errors=True)
             shutil.rmtree(self.index_json_path, ignore_errors=True)
 
         if index_exists:
             document_store = FAISSDocumentStore(
-                sql_url= "sqlite:///" + self.index_sql_path,
+                sql_url="sqlite:///"+self.index_sql_path,
                 index_path=self.index_faiss_path, config_path=self.index_json_path
             )
         else:
             document_store = FAISSDocumentStore(
-                sql_url= "sqlite:///" + self.index_sql_path,
+                sql_url="sqlite:///"+self.index_sql_path,
                 faiss_index_factory_str=self.index_type
             )
             assert document_store.faiss_index_factory_str == self.index_type
