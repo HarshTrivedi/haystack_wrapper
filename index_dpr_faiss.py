@@ -56,6 +56,7 @@ class FaissDocumentStoreManager:
 
         if delete_if_exists:
             shutil.rmtree(os.path.dirname(self.index_sql_path), ignore_errors=True)
+            os.makedirs(os.path.dirname(self.index_sql_path), exist_ok=True)
 
         index_exists = (
             os.path.exists(self.index_sql_path) and
