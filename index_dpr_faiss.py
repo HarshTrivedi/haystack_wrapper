@@ -1,3 +1,6 @@
+# NOTE(for future Harsh): This script turned out to be quite a bit slower than the milvus script
+# that is index_dpr.py. So this is not to be used. But I am keeping it if we want to release faiss
+# index for people to use.
 import os
 import re
 import json
