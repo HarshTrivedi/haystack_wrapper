@@ -99,7 +99,10 @@ beaker session create \
         print(f"Running: {command}")
         subprocess.run(command, shell=True)
 
-        command = "./occupy_cpu_runner_on_beaker.py start"
+        occupy_cpu_file_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "occupy_cpu_runner_on_beaker.py"
+        )
+        command = f"/.{occupy_cpu_file_path} start"
         print("Running: " + command)
         subprocess.run(command, shell=True)
 
@@ -111,7 +114,10 @@ beaker session create \
         print("Running: " + command)
         subprocess.run(command, shell=True)
 
-        command = "./occupy_cpu_runner_on_beaker.py stop"
+        occupy_cpu_file_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "occupy_cpu_runner_on_beaker.py"
+        )
+        command = f"/.{occupy_cpu_file_path} stop"
         print("Running: " + command)
         subprocess.run(command, shell=True)
 
