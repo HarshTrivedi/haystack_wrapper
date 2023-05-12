@@ -102,7 +102,9 @@ def main():
     allennlp_predict_subparser.add_argument(
         "prediction_file_path", nargs="?", help="data path to run prediction on.", default=None
     )
-    allennlp_predict_subparser.add_argument("--batch_size", type=int, help="batch_size", default=256)
+    allennlp_predict_subparser.add_argument(
+        "--batch_size", type=int, help="batch_size", default=256 # no point increasing it, knn is bs=1
+    )
     args = allennlp_root_parser.parse_args()
 
     if args.num_gpus is None:
