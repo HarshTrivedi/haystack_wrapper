@@ -1,3 +1,5 @@
+import os
+
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
     index_data_path = index_data_path.replace( # TODO: Temporary hack to get natcq a good name. Fix later.
