@@ -28,7 +28,7 @@ def make_image(
     build_args_str = ""
     if build_args:
         build_args_str = "--build-arg "
-        build_args_str += " ".join([f"{key}={value}." for key, value in build_args.items()])
+        build_args_str += " ".join([f"{key}={value}" for key, value in build_args.items()])
 
     directory = os.path.dirname(os.path.realpath(__file__))
     dockerfile_path = os.path.join(directory, "dockerfiles", docker_file_name)
