@@ -16,7 +16,7 @@ COPY install_docker_compose.sh install_docker_compose.sh
 RUN bash install_docker_compose.sh
 
 # To run the server directly:
-ENTRYPOINT ["docker", "compose", "up", "-d"]
+ENTRYPOINT [POSTGRESQL_DATA_DIRECTORY=${POSTGRESQL_DATA_DIRECTORY} MILVUS_DATA_DIRECTORY=${MILVUS_DATA_DIRECTORY} "docker", "compose", "up", "-d"]
 
 # To run bash:
 # ENTRYPOINT ["bash", "-l"]
