@@ -4,10 +4,28 @@ import json
 import argparse
 import subprocess
 
-import _jsonnet
-
 from run_on_beaker_lib import get_beaker_config, make_image
 from index_dpr import get_index_name
+
+
+def load_jsonnet(file_path: str):
+    # Since I can't use jsonnet on beaker without creating a session
+    # I have to rely on just json. But I want to allow comments yet.
+    # I won't be able to use other features, but that's fine.
+    with open(file_path, "r") as file:
+        content = file.read(file_path).strip()
+
+    def remove_comment(line: str):
+        assert "\n" not in line
+        for marker in ["#", "//"]:
+            # NOTE: it doesn't handle the case when # or // is within a string.
+            if f" {marker} " in line:
+                line = line.split(f" {marker} ")[0]
+        return line
+            
+    content = "\n".join([remove_comment(line) for line in content.split("\n")])
+    instance = json.loads(content)
+    return instance
 
 
 def get_image_name(index_name: str) -> str:
@@ -46,7 +64,7 @@ def main():
         if not os.path.exists(experiment_config_file_path):
             exit(f"Experiment config file_path {experiment_config_file_path} not found.")
 
-        experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
+        experiment_config = load_jsonnet(experiment_config_file_path)
         index_data_path = experiment_config.pop("index_data_path")
         index_name = get_index_name(args.experiment_name, index_data_path)
 
