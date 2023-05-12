@@ -34,6 +34,8 @@ def main():
     if args.command == "start":
         assert args.experiment_name, \
             "Experiment name must be passed to start the servers."
+        assert os.path.exists(os.path.join("experiment_configs", args.experiment_name + ".jsonnet")), \
+            "The experiment file_path not found."
     else:
         assert not args.experiment_name, \
             "Status/stop are not dependent on the experiment name, but it's still passed."
