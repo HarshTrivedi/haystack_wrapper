@@ -13,7 +13,7 @@ def load_jsonnet(file_path: str):
     # I have to rely on just json. But I want to allow comments yet.
     # I won't be able to use other features, but that's fine.
     with open(file_path, "r") as file:
-        content = file.read(file_path).strip()
+        content = file.read().strip()
 
     def remove_comment(line: str):
         assert "\n" not in line
