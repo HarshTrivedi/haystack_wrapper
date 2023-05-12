@@ -16,7 +16,9 @@ def main():
     )
     args = parser.parse_args()
 
-    nohup_file_path = ".occupy_cpu.nohup"
+    nohup_file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), ".occupy_cpu.nohup"
+    )
 
     if args.command == "start":
         image_name = "occupy_cpu"
