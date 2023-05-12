@@ -9,7 +9,7 @@ from haystack.document_stores import MilvusDocumentStore
 from pymilvus import connections
 
 from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
-from index_dpr import get_index_name
+from dpr_lib import get_index_name
 from haystack_monkeypatch import monkeypath_retriever
 
 

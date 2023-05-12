@@ -5,7 +5,7 @@ import argparse
 import subprocess
 
 from run_on_beaker_lib import get_beaker_config, make_image
-from index_dpr import get_index_name
+from dpr_lib import get_index_name
 
 
 def load_jsonnet(file_path: str):

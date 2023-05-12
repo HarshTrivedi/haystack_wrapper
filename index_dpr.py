@@ -11,21 +11,8 @@ from haystack.document_stores import MilvusDocumentStore
 from pymilvus import list_collections, connections, Collection
 
 from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
+from dpr_lib import get_index_name
 from haystack_monkeypatch import monkeypath_retriever
-
-
-def get_index_name(experiment_name: str, index_data_path: str) -> str:
-    index_data_path = index_data_path.replace( # TODO: Temporary hack to get natcq a good name. Fix later.
-        "combined_cleaned_wikipedia_for_dpr", "processed_datasets/natcq/"
-    )
-    data_name = os.path.splitext(
-        index_data_path
-    )[0].replace("processed_datasets/", "").replace("processed_data/", "").replace("/", "__")
-    index_name = "___".join([experiment_name, data_name])
-    if len(index_name) >= 100:
-        # without this I am not able to make insertions
-        index_name = index_name[-100:]
-    return index_name
 
 
 def build_document_store(
