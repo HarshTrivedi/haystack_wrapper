@@ -187,10 +187,14 @@ def main():
         str(key).replace(".", "__"): str(value) for key, value in flatten_dict(experiment_config).items()
     }
     envs["IS_ON_BEAKER"] = "true"
-    envs["POSTGRESQL_DATA_DIRECTORY"] = os.environ["POSTGRESQL_DATA_DIRECTORY"]
-    envs["MILVUS_DATA_DIRECTORY"] = os.environ["MILVUS_DATA_DIRECTORY"]
-    envs["POSTGRESQL_SERVER_ADDRESS"] = os.environ["POSTGRESQL_SERVER_ADDRESS"]
-    envs["MILVUS_SERVER_ADDRESS"] = os.environ["MILVUS_SERVER_ADDRESS"]
+    if "POSTGRESQL_DATA_DIRECTORY" in os.environ:
+        envs["POSTGRESQL_DATA_DIRECTORY"] = os.environ["POSTGRESQL_DATA_DIRECTORY"]
+    if "MILVUS_DATA_DIRECTORY" in os.environ:
+        envs["MILVUS_DATA_DIRECTORY"] = os.environ["MILVUS_DATA_DIRECTORY"]
+    if "POSTGRESQL_SERVER_ADDRESS" in os.environ:
+        envs["POSTGRESQL_SERVER_ADDRESS"] = os.environ["POSTGRESQL_SERVER_ADDRESS"]
+    if "MILVUS_SERVER_ADDRESS" in os.environ:
+        envs["MILVUS_SERVER_ADDRESS"] = os.environ["MILVUS_SERVER_ADDRESS"]
 
     wandb_configs = get_wandb_configs()
     if wandb_configs is None:
