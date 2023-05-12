@@ -1,7 +1,7 @@
 import os
 import json
-import argparse
 import subprocess
+from typing import Dict
 
 
 def get_beaker_config():
@@ -14,13 +14,24 @@ def get_beaker_config():
     return beaker_config
 
 
-def make_image(image_name: str, docker_file_name: str, update_if_exists: bool = False):
+def make_image(
+    image_name: str,
+    docker_file_name: str,
+    build_args: Dict = None,
+    update_if_exists: bool = False,
+):
 
     user_name = get_beaker_config()["user_name"]
     beaker_workspace = get_beaker_config()["beaker_workspace"]
 
+    build_args = build_args or {}
+    build_args_str = ""
+    if build_args:
+        build_args_str = "--build-arg "
+        build_args_str += " ".join([f"{key}={value}." for key, value in build_args.items()])
+
     dockerfile_path = os.path.join("dockerfiles", docker_file_name)
-    command = f"docker build -t {image_name} . -f {dockerfile_path}"
+    command = f"docker build -t {image_name} . -f {dockerfile_path} {build_args_str}".strip()
     print(f"Running: {command}")
     subprocess.run(command, shell=True, stdout=open(os.devnull, 'wb'))
 

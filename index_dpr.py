@@ -15,6 +15,9 @@ from haystack_monkeypatch import monkeypath_retriever
 
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
+    index_data_path = index_data_path.replace( # TODO: Temporary hack to get natcq a good name. Fix later.
+        "combined_cleaned_wikipedia_for_dpr", "processed_datasets/natcq/"
+    )
     data_name = os.path.splitext(
         index_data_path
     )[0].replace("processed_datasets/", "").replace("processed_data/", "").replace("/", "__")
