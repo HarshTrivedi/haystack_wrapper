@@ -60,6 +60,10 @@ def main():
         host=milvus_host, port=milvus_port,
         index=index_name
     )
+
+    number_of_documents = document_store.get_document_count()
+    print(f"Number of total documents in the index: {number_of_documents}")
+
     assert not document_store.collection.is_empty
     assert document_store.index_type == index_type
 
