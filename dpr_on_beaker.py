@@ -79,6 +79,9 @@ def main():
         default="safe_a1000s"
     )
     allennlp_base_parser.add_argument(
+        "--num_gpus", type=int, help="number of gpus.", default=1
+    )
+    allennlp_base_parser.add_argument(
         "--copy_url", action="store_true", help="don't run, just copy beaker URL."
     )
     allennlp_base_parser.add_argument(
@@ -232,7 +235,7 @@ def main():
         "docker_filepath": dockerfile_file_path,
         "local_output_directory": local_output_directory,
         "beaker_output_directory": beaker_output_directory,
-        "gpu_count": 4 if args.command == "index" else 1,
+        "gpu_count": args.num_gpus,
         "cpu_count": 15,
         "memory": "16GiB",
         "parallel_run_count": 1,
