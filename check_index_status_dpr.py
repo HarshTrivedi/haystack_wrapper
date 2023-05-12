@@ -55,8 +55,9 @@ def main():
     print(f"Index name: {index_name}")
     number_of_documents = document_store.get_document_count()
     print(f"Number of total documents with or without embeddings so far: {number_of_documents}")
-    number_of_documents = document_store.get_embedding_count()
-    print(f"Number of total documents with embeddings so far: {number_of_documents}")
+    # This is very slow for some reason, so skipping it.
+    # number_of_documents = document_store.get_embedding_count()
+    # print(f"Number of total documents with embeddings so far: {number_of_documents}")
 
 
 if __name__ == "__main__":

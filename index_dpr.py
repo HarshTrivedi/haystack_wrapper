@@ -165,9 +165,10 @@ def main():
         document_store.update_embeddings(
             retriever, batch_size=10_000, update_existing_embeddings=False,
         )
-        time.sleep(2) # needs some time to update num_entites
-        number_of_documents = document_store.get_embedding_count()
-        print(f"Number of total documents with embeddings so far: {number_of_documents}")
+        # This is very slow for some reason, so skipping it.
+        # time.sleep(2) # needs some time to update num_entites
+        # number_of_documents = document_store.get_embedding_count()
+        # print(f"Number of total documents with embeddings so far: {number_of_documents}")
 
 
 if __name__ == "__main__":
