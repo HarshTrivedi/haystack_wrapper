@@ -35,10 +35,10 @@ def load_jsonnet(file_path: str):
 
 
 def get_image_name(index_name: str) -> str:
-    index_name = index_name.replace("___", "--") # for some reason ___ are making docker unhappy.
     image_name = f"natcq_postgresql_milvus__{index_name}"
     if len(image_name) >= 100:
         image_name = image_name[-100:]
+    index_name = index_name.replace("-", "").replace("_", "") # docker complaining for _ - in some cases.
     return image_name
 
 
