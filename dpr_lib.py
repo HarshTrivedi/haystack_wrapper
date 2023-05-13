@@ -40,12 +40,23 @@ def build_document_store(
     milvus_port: str,
     index_name: str,
     index_type: str
+    # TODO: Pass other parameters also.
 ):
+    # nlist is set at the indexing time and nprobe is set at the search time (https://milvus.io/docs/index.md).
+    # A bug in milvus store makes passing index_param necessary (https://github.com/deepset-ai/haystack/issues/4681)
+    # Check this out to see how to set the nlist and nprobe parameters:
+    # https://milvus.io/docs/v1.1.1/performance_faq.md#How-to-set-nlist-and-nprobe-for-IVF-indexes
+    # The nlist=16348 and nprob=512 values are set based on the curve given there. May be revisit it at some point.
+    # On increasing index_file_size, indexing will slow, but querying will be fast. https://milvus.io/docs/v1.1.1/tuning.md
     document_store = MilvusDocumentStore(
         sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
         host=milvus_host, port=milvus_port,
         index=index_name, index_type=index_type,
         embedding_dim=768, id_field="id", embedding_field="embedding",
-        progress_bar=True
+        progress_bar=True,
+        index_file_size=1024,
+        index_param={"nlist": 16384},
+        search_param={"params": {"nprobe": 512}},
+        similarity="dot_product",
     )
     return document_store
