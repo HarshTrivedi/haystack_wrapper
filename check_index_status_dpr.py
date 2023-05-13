@@ -4,11 +4,9 @@ import argparse
 
 import _jsonnet
 from dotenv import load_dotenv
-from pymilvus import list_collections, connections, Collection
 
 from lib import get_postgresql_address, get_milvus_address
-from dpr_lib import get_index_name
-from index_dpr import build_document_store
+from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
 
 
 def main():
@@ -26,24 +24,20 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
-    index_data_path = experiment_config.pop("index_data_path")
-
+    print("Connecting to Milvus.")
     milvus_host, milvus_port = get_milvus_address()
+    milvus_connect(milvus_host, milvus_port)
 
-    connections.add_connection(default={"host": milvus_host, "port": milvus_port})
-    connections.connect()
-    collection_names = list_collections()
-    collection_name_to_sizes = {}
-    for collection_name in collection_names:
-        collection = Collection(name=collection_name)
-        collection.load()
-        collection_name_to_sizes[collection_name] = collection.num_entities
-    print("Milvus collections stats:")
+    print("Milvus collections stats.")
+    collection_name_to_sizes = get_collection_name_to_sizes()
     print(json.dumps(collection_name_to_sizes, indent=4))
 
+    index_data_path = experiment_config.pop("index_data_path")
     index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
+    print(f"Index name: {index_name}")
+    print(f"Index type: {index_type}")
 
     print("Initializing MilvusDocumentStore.")
     postgresql_host, postgresql_port = get_postgresql_address()
@@ -58,6 +52,12 @@ def main():
     # This is very slow for some reason, so skipping it.
     # number_of_documents = document_store.get_embedding_count()
     # print(f"Number of total documents with embeddings so far: {number_of_documents}")
+
+    if collection_name_to_sizes and list(collection_name_to_sizes.keys()) != [index_name]:
+        print(
+            "WARNING: Looks like your running on an incorrect milvus server. "
+            "The index name on the server doesn't match the client."
+        )
 
 
 if __name__ == "__main__":
