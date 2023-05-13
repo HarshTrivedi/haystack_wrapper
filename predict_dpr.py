@@ -28,24 +28,23 @@ def main():
     parser.add_argument("--output_directory", type=str, help="output_directory", default=None)
     args = parser.parse_args()
 
-    print("Connecting to Milvus.")
-    milvus_host, milvus_port = get_milvus_address()
-    milvus_connect(milvus_host, milvus_port)
-
-    print("Milvus collections stats.")
-    collection_name_to_sizes = get_collection_name_to_sizes()
-    print(json.dumps(collection_name_to_sizes, indent=4))
-    if collection_name_to_sizes:
-        assert list(collection_name_to_sizes.keys()) == [index_name], \
-            "Looks like your running on an incorrect milvus server. " \
-            "The index name on the server doesn't match the client."
-
     experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):
         exit(f"Experiment config file_path {experiment_config_file_path} not found.")
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
     batch_size = experiment_config.get("predict_batch_size", args.batch_size)
+
+    if not args.prediction_file_path:
+        print("The prediction file path is not passed, defaulting to dev file_path from the config:")
+        args.prediction_file_path = os.path.join(
+            experiment_config["data_dir"], experiment_config["dev_filename"]
+        )
+        print(args.prediction_file_path)
+
+    print("Connecting to Milvus.")
+    milvus_host, milvus_port = get_milvus_address()
+    milvus_connect(milvus_host, milvus_port)
 
     index_data_path = experiment_config.pop("index_data_path")
     index_name = get_index_name(args.experiment_name, index_data_path)
@@ -54,12 +53,13 @@ def main():
     print(f"Index name: {index_name}")
     print(f"Index type: {index_type}")
 
-    if not args.prediction_file_path:
-        print("The prediction file path is not passed, defaulting to dev file_path from the config:")
-        args.prediction_file_path = os.path.join(
-            experiment_config["data_dir"], experiment_config["dev_filename"]
-        )
-        print(args.prediction_file_path)
+    print("Milvus collections stats.")
+    collection_name_to_sizes = get_collection_name_to_sizes()
+    print(json.dumps(collection_name_to_sizes, indent=4))
+    if collection_name_to_sizes:
+        assert list(collection_name_to_sizes.keys()) == [index_name], \
+            "Looks like your running on an incorrect milvus server. " \
+            "The index name on the server doesn't match the client."
 
     print("Initializing MilvusDocumentStore.")
     postgresql_host, postgresql_port = get_postgresql_address()

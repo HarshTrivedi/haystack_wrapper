@@ -30,12 +30,17 @@ def main():
 
     experiment_config = json.loads(_jsonnet.evaluate_file(experiment_config_file_path))
 
-    index_data_path = experiment_config.pop("index_data_path")
-    index_num_chunks = experiment_config.pop("index_num_chunks", 1)
-
     print("Connecting to Milvus.")
     milvus_host, milvus_port = get_milvus_address()
     milvus_connect(milvus_host, milvus_port)
+
+    index_data_path = experiment_config.pop("index_data_path")
+    index_num_chunks = experiment_config.pop("index_num_chunks", 1)
+    index_name = get_index_name(args.experiment_name, index_data_path)
+    index_type = experiment_config.pop("index_type")
+    assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
+    print(f"Index name: {index_name}")
+    print(f"Index type: {index_type}")
 
     print("Milvus collections stats.")
     collection_name_to_sizes = get_collection_name_to_sizes()
@@ -44,12 +49,6 @@ def main():
         assert list(collection_name_to_sizes.keys()) == [index_name], \
             "Looks like your running on an incorrect milvus server. " \
             "The index name on the server doesn't match the client."
-
-    index_name = get_index_name(args.experiment_name, index_data_path)
-    index_type = experiment_config.pop("index_type")
-    assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
-    print(f"Index name: {index_name}")
-    print(f"Index type: {index_type}")
 
     print("Initializing MilvusDocumentStore.")
     postgresql_host, postgresql_port = get_postgresql_address()
