@@ -1,36 +1,15 @@
 import os
 import json
 import argparse
-import time
 
 import _jsonnet
 from progressbar import progressbar
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
-from haystack.document_stores import MilvusDocumentStore
-from pymilvus import list_collections, connections, Collection
 
 from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
-from dpr_lib import get_index_name
+from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
 from haystack_monkeypatch import monkeypath_retriever
-
-
-def build_document_store(
-    postgresql_host: str,
-    postgresql_port: str,
-    milvus_host: str,
-    milvus_port: str,
-    index_name: str,
-    index_type: str
-):
-    document_store = MilvusDocumentStore(
-        sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
-        host=milvus_host, port=milvus_port,
-        index=index_name, index_type=index_type,
-        embedding_dim=768, id_field="id", embedding_field="embedding",
-        progress_bar=True
-    )
-    return document_store
 
 
 def main():
@@ -54,36 +33,31 @@ def main():
     index_data_path = experiment_config.pop("index_data_path")
     index_num_chunks = experiment_config.pop("index_num_chunks", 1)
 
+    print("Connecting to Milvus.")
     milvus_host, milvus_port = get_milvus_address()
+    milvus_connect(milvus_host, milvus_port)
 
-    connections.add_connection(default={"host": milvus_host, "port": milvus_port})
-    connections.connect()
-    collection_names = list_collections()
-    collection_name_to_sizes = {}
-    for collection_name in collection_names:
-        collection = Collection(name=collection_name)
-        collection.load()
-        collection_name_to_sizes[collection_name] = collection.num_entities
-    print("Milvus collections stats:")
+    print("Milvus collections stats.")
+    collection_name_to_sizes = get_collection_name_to_sizes()
     print(json.dumps(collection_name_to_sizes, indent=4))
-
-    print("Building MilvusDocumentStore.")
-
-    postgresql_host, postgresql_port = get_postgresql_address()
+    if collection_name_to_sizes:
+        assert list(collection_name_to_sizes.keys()) == [index_name], \
+            "Looks like your running on an incorrect milvus server. " \
+            "The index name on the server doesn't match the client."
 
     index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
-    print("Initializing MilvusDocumentStore.")
+    print(f"Index name: {index_name}")
+    print(f"Index type: {index_type}")
 
+    print("Initializing MilvusDocumentStore.")
+    postgresql_host, postgresql_port = get_postgresql_address()
     document_store = build_document_store(
         postgresql_host, postgresql_port,
         milvus_host, milvus_port,
         index_name, index_type
     )
-
-    print(f"Index name: {index_name}")
-    print(f"Index type: {index_type}")
 
     if args.delete_if_exists:
         print(f"Deleting index {index_name} if it exists.")
@@ -150,8 +124,9 @@ def main():
         for i in progressbar(range(0, len(documents), 10)):
             document_store.write_documents(documents[i:i + 10], duplicate_documents="skip")
 
+        print("Computing number of total documents in the index (with or without embeddings).")
         number_of_documents = document_store.get_document_count()
-        print(f"Number of total documents with or without embeddings so far: {number_of_documents}")
+        print(f"It is: {number_of_documents}")
 
         print("Embedding texts in MilvusDocumentStore using DPR retriever models.")
         # The data will be stored in milvus server (just like es).

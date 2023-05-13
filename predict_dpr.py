@@ -5,11 +5,9 @@ import argparse
 import _jsonnet
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
-from haystack.document_stores import MilvusDocumentStore
-from pymilvus import connections
 
 from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
-from dpr_lib import get_index_name
+from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
 from haystack_monkeypatch import monkeypath_retriever
 
 
@@ -17,9 +15,6 @@ def main():
     # https://haystack.deepset.ai/tutorials/06_better_retrieval_via_embedding_retrieval
 
     load_dotenv()
-    milvus_host, milvus_port = get_milvus_address()
-    connections.add_connection(default={"host": milvus_host, "port": milvus_port})
-    connections.connect()
 
     parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     parser.add_argument(
@@ -33,6 +28,18 @@ def main():
     parser.add_argument("--output_directory", type=str, help="output_directory", default=None)
     args = parser.parse_args()
 
+    print("Connecting to Milvus.")
+    milvus_host, milvus_port = get_milvus_address()
+    milvus_connect(milvus_host, milvus_port)
+
+    print("Milvus collections stats.")
+    collection_name_to_sizes = get_collection_name_to_sizes()
+    print(json.dumps(collection_name_to_sizes, indent=4))
+    if collection_name_to_sizes:
+        assert list(collection_name_to_sizes.keys()) == [index_name], \
+            "Looks like your running on an incorrect milvus server. " \
+            "The index name on the server doesn't match the client."
+
     experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):
         exit(f"Experiment config file_path {experiment_config_file_path} not found.")
@@ -42,6 +49,10 @@ def main():
 
     index_data_path = experiment_config.pop("index_data_path")
     index_name = get_index_name(args.experiment_name, index_data_path)
+    index_type = experiment_config.pop("index_type")
+    assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
+    print(f"Index name: {index_name}")
+    print(f"Index type: {index_type}")
 
     if not args.prediction_file_path:
         print("The prediction file path is not passed, defaulting to dev file_path from the config:")
@@ -50,24 +61,23 @@ def main():
         )
         print(args.prediction_file_path)
 
-    serialization_dir = os.path.join("serialization_dir", args.experiment_name)
-
+    print("Initializing MilvusDocumentStore.")
     postgresql_host, postgresql_port = get_postgresql_address()
-
-    index_type = experiment_config.pop("index_type")
-    document_store = MilvusDocumentStore(
-        sql_url=f"postgresql://postgres:postgres@{postgresql_host}:{postgresql_port}/postgres",
-        host=milvus_host, port=milvus_port,
-        index=index_name
+    document_store = build_document_store(
+        postgresql_host, postgresql_port,
+        milvus_host, milvus_port,
+        index_name, index_type
     )
 
+    print("Computing number of total documents in the index.")
     number_of_documents = document_store.get_document_count()
-    print(f"Number of total documents in the index: {number_of_documents}")
+    print(f"It is: {number_of_documents}")
 
     assert not document_store.collection.is_empty
     assert document_store.index_type == index_type
 
     dont_train = experiment_config.pop("dont_train", False)
+    serialization_dir = os.path.join("serialization_dir", args.experiment_name)
     if dont_train:
         query_model = experiment_config["query_model"]
         passage_model = experiment_config["passage_model"]
