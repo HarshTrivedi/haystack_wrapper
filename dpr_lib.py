@@ -1,7 +1,5 @@
 import os
 from typing import Dict
-from pymilvus import list_collections, connections, Collection
-from haystack.document_stores import MilvusDocumentStore
 
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
@@ -19,11 +17,13 @@ def get_index_name(experiment_name: str, index_data_path: str) -> str:
 
 
 def milvus_connect(milvus_host: str, milvus_port: str):
+    from pymilvus import connections
     connections.add_connection(default={"host": milvus_host, "port": milvus_port})
     connections.connect()
 
 
 def get_collection_name_to_sizes() -> Dict:
+    from pymilvus import list_collections, Collection
     collection_names = list_collections()
     collection_name_to_sizes = {}
     for collection_name in collection_names:
@@ -42,6 +42,7 @@ def build_document_store(
     index_type: str
     # TODO: Pass other parameters also.
 ):
+    from haystack.document_stores import MilvusDocumentStore
     # nlist is set at the indexing time and nprobe is set at the search time (https://milvus.io/docs/index.md).
     # A bug in milvus store makes passing index_param necessary (https://github.com/deepset-ai/haystack/issues/4681)
     # Check this out to see how to set the nlist and nprobe parameters:
