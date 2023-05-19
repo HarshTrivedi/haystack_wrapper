@@ -45,8 +45,13 @@ def main():
     print("Milvus collections stats.")
     collection_name_to_sizes = get_collection_name_to_sizes()
     print(json.dumps(collection_name_to_sizes, indent=4))
-    if collection_name_to_sizes:
-        assert list(collection_name_to_sizes.keys()) == [index_name], \
+
+    non_empty_collection_names = [
+        collection_name for collection_name, size in collection_name_to_sizes.items()
+        if size > 0
+    ]
+    if non_empty_collection_names:
+        assert non_empty_collection_names == [index_name], \
             "Looks like your running on an incorrect milvus server. " \
             "The index name on the server doesn't match the client."
 
