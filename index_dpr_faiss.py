@@ -10,11 +10,10 @@ import shutil
 
 import _jsonnet
 from progressbar import progressbar
-from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import FAISSDocumentStore
 
-from lib import yield_jsonl_slice
+from lib import yield_jsonl_slice, load_cwd_dotenv
 from haystack_monkeypatch import monkeypath_retriever
 
 
@@ -96,7 +95,7 @@ def main():
     )
     parser.add_argument("--delete_if_exists", action="store_true", default=False, help="delete index if it exists.")
     args = parser.parse_args()
-    load_dotenv()
+    load_cwd_dotenv()
 
     experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):

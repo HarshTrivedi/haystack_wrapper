@@ -3,6 +3,7 @@ import json
 import math
 from typing import Dict, List, Union, Any
 from tqdm import tqdm
+from dotenv import load_dotenv
 from functools import lru_cache
 
 
@@ -121,3 +122,8 @@ def get_milvus_address():
     milvus_host, milvus_port = milvus_address.split(":")
     assert "//" not in milvus_host
     return milvus_host, milvus_port
+
+
+def load_cwd_dotenv():
+    env_path = os.path.join(os.getcwd(), ".env")
+    load_dotenv(env_path)

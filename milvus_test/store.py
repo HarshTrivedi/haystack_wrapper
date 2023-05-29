@@ -1,9 +1,8 @@
-from dotenv import load_dotenv
 from haystack.document_stores import MilvusDocumentStore
 from pymilvus import connections
 from lib import get_postgresql_address, get_milvus_address
 
-load_dotenv()
+load_cwd_dotenv()
 
 milvus_host, milvus_port = get_milvus_address()
 postgresql_host, postgresql_port = get_postgresql_address()

@@ -1,5 +1,4 @@
-from dotenv import load_dotenv
-from lib import get_postgresql_address, get_milvus_address
+from lib import get_postgresql_address, get_milvus_address, load_cwd_dotenv
 
 
 def test_postgresql_connection():
@@ -31,7 +30,7 @@ def test_milvus_connection():
 
 
 def main():
-    load_dotenv()
+    load_cwd_dotenv()
     test_postgresql_connection()
     test_milvus_connection()
 

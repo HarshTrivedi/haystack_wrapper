@@ -4,10 +4,9 @@ import argparse
 
 import _jsonnet
 from progressbar import progressbar
-from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 
-from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address
+from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address, load_cwd_dotenv
 from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
 from haystack_monkeypatch import monkeypath_retriever
 
@@ -22,7 +21,7 @@ def main():
     )
     parser.add_argument("--delete_if_exists", action="store_true", default=False, help="delete index if it exists.")
     args = parser.parse_args()
-    load_dotenv()
+    load_cwd_dotenv()
 
     experiment_config_file_path = os.path.join("experiment_configs", args.experiment_name + ".jsonnet")
     if not os.path.exists(experiment_config_file_path):

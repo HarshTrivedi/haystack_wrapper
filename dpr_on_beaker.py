@@ -5,10 +5,9 @@ import subprocess
 
 import _jsonnet
 import pyperclip
-from dotenv import load_dotenv
 
 from beakerizer import utils as beaker_utils
-from lib import flatten_dict, get_wandb_configs
+from lib import flatten_dict, get_wandb_configs, load_cwd_dotenv
 from run_name import get_run_name
 
 
@@ -50,7 +49,7 @@ def experiment_name_to_pretrained_experiment_name(experiment_name: str) -> str:
 
 
 def main():
-    load_dotenv()
+    load_cwd_dotenv()
     allennlp_root_parser = argparse.ArgumentParser(description="Allennlp-style wrapper around Haystack.")
     allennlp_base_parser = argparse.ArgumentParser(add_help=False)
     allennlp_subparsers = allennlp_root_parser.add_subparsers(title="Commands", metavar="", dest="command")
@@ -221,7 +220,7 @@ def main():
         envs["WANDB_RUN_NAME"] = run_name
 
     if args.command in ("index", "predict"):
-        load_dotenv()
+        load_cwd_dotenv()
         envs["POSTGRESQL_SERVER_ADDRESS"] = os.environ["POSTGRESQL_SERVER_ADDRESS"]
         envs["MILVUS_SERVER_ADDRESS"] = os.environ["MILVUS_SERVER_ADDRESS"]
 
