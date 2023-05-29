@@ -125,6 +125,7 @@ def main():
 
     if args.command == "download_predictions":
         # Handle 'download' first as it's only one that requires 'download', others require 'run'.
+        # TODO: cluster, num_gpus etc are not used here, consider scoping them to the individual subparsers.
         beaker_experiment_name = beaker_utils.experiment_url_to_name(args.beaker_url)
         beakerizer_config_file_path = os.path.join(
             "beaker_configs", beaker_experiment_name + ".jsonnet"
