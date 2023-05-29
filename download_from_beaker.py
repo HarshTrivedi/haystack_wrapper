@@ -9,7 +9,6 @@ from beakerizer import utils as beaker_utils
 def main():
     parser = argparse.ArgumentParser(description="Download from beaker.")
     parser.add_argument("beaker_url", help="URL of the beaker run.")
-    parser.add_argument("--force", action="store_true", help="force download even if it exists.")
     args = parser.parse_args()
 
     beaker_experiment_name = beaker_utils.experiment_url_to_name(args.beaker_url)
@@ -25,8 +24,6 @@ def main():
         )
 
     command = f"python beakerizer/download.py {beaker_experiment_name}"
-    if args.force:
-        command += " --force"
 
     print(f"Running: {command}")
     subprocess.call(command, shell=True)
