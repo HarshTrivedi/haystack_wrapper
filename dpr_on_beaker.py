@@ -105,6 +105,15 @@ def main():
     allennlp_predict_subparser.add_argument(
         "--batch_size", type=int, help="batch_size", default=256 # no point increasing it, knn is bs=1
     )
+    allennlp_download_predictions_subparser = allennlp_subparsers.add_parser(
+        "download_predictions", description="Download Predictions", help="Download Predictions", parents=[allennlp_base_parser]
+    )
+    allennlp_download_predictions_subparser.add_argument(
+        "beaker_url", help="URL of the beaker prediction run"
+    )
+    allennlp_download_predictions_subparser.add_argument(
+        "--force", action="store_true", help="force download even if it exists."
+    )
     args = allennlp_root_parser.parse_args()
 
     if args.num_gpus is None:
@@ -112,6 +121,28 @@ def main():
 
     if not args.command:
         allennlp_root_parser.print_help()
+        exit()
+
+    if args.command == "download_predictions":
+        # Handle 'download' first as it's only one that requires 'download', others require 'run'.
+        beaker_experiment_name = beaker_utils.experiment_url_to_name(args.beaker_url)
+        beakerizer_config_file_path = os.path.join(
+            "beaker_configs", beaker_experiment_name + ".jsonnet"
+        )
+        if not os.path.exists(beakerizer_config_file_path):
+            # TODO: This can be handled by moving up the code do generate+save the beakerizer_config
+            # revisit it if needed.
+            raise Exception(
+                f"Beakerizer config {beakerizer_config_file_path} not found. "
+                f"You might have run the experiment on a different machine"
+            )
+
+        command = f"python beakerizer/download.py {beaker_experiment_name}"
+        if args.force:
+            command += " --force"
+
+        print(f"Running: {command}")
+        subprocess.call(command, shell=True)
         exit()
 
     experiment_config_file_path = os.path.join("experiment_configs", f"{args.experiment_name}.jsonnet")
