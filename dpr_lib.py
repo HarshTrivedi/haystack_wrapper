@@ -65,7 +65,7 @@ def build_document_store(
         index_param = {"nlist": 16384}
         search_param = {"nprobe": 512}
     elif index_type == "HNSW":
-        index_param = {"M": 512, "efConstruction": 200}
+        index_param = {"M": 64, "efConstruction": 200}
         search_param = {"ef": 128}
     else:
         raise Exception(f"index_type must be IVF_FLAT or HNSW, found {index_type}")
