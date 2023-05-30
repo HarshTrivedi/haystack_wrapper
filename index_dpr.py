@@ -111,14 +111,11 @@ def main():
             document["id"] = true_document_id[-100:] # o/w raises error. The true ID will be in the metadata.
             document["meta"]["id_prefix"] = true_document_id.replace(document["id"], "")
             assert true_document_id == document["meta"]["id_prefix"] + document["id"]
-            document["meta"] = {
-                # don't add anything else, as it's unnecessary and causes length problems.
-                "id_prefix": document["meta"]["id_prefix"],
-                "section_index": document["meta"]["section_index"],
-                "document_type": document["meta"]["document_type"],
-                "document_index": document["meta"]["document_index"],
-                "document_sub_index": document["meta"]["document_sub_index"],
-            }
+            metadata = {}
+            for key_name in ["id_prefix", "section_index", "document_type", "document_index", "document_sub_index"]:
+                if key_name in document["meta"]:
+                    metadata[key_name] = document["meta"][key_name]
+            document["meta"] = metadata
             documents.append(document)
 
         num_documents = len(documents)
