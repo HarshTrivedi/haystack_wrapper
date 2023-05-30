@@ -25,10 +25,15 @@ def milvus_connect(milvus_host: str, milvus_port: str):
 
 def get_collection_name_to_sizes() -> Dict:
     from pymilvus import list_collections, Collection
+    from pymilvus.exceptions import IndexNotExistException
     collection_names = list_collections()
     collection_name_to_sizes = {}
     for collection_name in collection_names:
         collection = Collection(name=collection_name)
+        try:
+            collection.index()
+        except IndexNotExistException:
+            continue
         collection.load()
         collection_name_to_sizes[collection_name] = collection.num_entities
     return collection_name_to_sizes
