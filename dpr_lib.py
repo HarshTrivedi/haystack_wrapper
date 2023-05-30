@@ -13,6 +13,7 @@ def get_index_name(experiment_name: str, index_data_path: str) -> str:
     if len(index_name) >= 100:
         # without this I am not able to make insertions
         index_name = index_name[-100:]
+    index_name = index_name.replace("-", "_") # only numbers, letters and underscores are allowed.
     return index_name
 
 
