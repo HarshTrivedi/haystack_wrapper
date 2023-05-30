@@ -60,7 +60,7 @@ def build_document_store(
     # DPR paper has used this: 512, 200 | 128 (see footnote 10)
     # Haystack benchmark uses (https://haystack.deepset.ai/benchmarks/v0.9.0): 128, 80 | 20
     # milvus caps M to be maximum 64, so I can't increase it beyond that.
-    if index_type == "IVF_FLAT"
+    if index_type == "IVF_FLAT":
         index_param = {"nlist": 16384}
         search_param = {"nprobe": 512}
     elif index_type == "HNSW":
