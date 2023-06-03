@@ -10,6 +10,7 @@ def get_index_name(experiment_name: str, index_data_path: str, index_type: str) 
     data_name = os.path.splitext(
         index_data_path
     )[0].replace("processed_datasets/", "").replace("processed_data/", "").replace("/", "__")
+    index_type = index_type.lower()
     index_name = "___".join([experiment_name, data_name, index_type])
     if len(index_name) >= 100:
         # without this I am not able to make insertions in milvus.
