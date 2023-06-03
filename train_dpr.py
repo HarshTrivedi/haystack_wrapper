@@ -91,7 +91,9 @@ def main():
     checkpoint_dir = os.path.join(serialization_dir, "model_checkpoints")
     os.makedirs(checkpoint_dir, exist_ok=True)
 
-    monkeypatch_result_logger()
+    metrics_dir = os.path.join(serialization_dir, "metrics")
+    os.makedirs(metrics_dir, exist_ok=True)
+    monkeypatch_result_logger(metrics_dir)
     retriever.train(
         data_dir=haystack_args.data_dir,
         train_filename=haystack_args.train_filename,

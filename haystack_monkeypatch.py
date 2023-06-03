@@ -5,6 +5,7 @@ import sys
 import types
 import numbers
 import logging
+from functools import partial
 from typing import Optional, Dict, List, Union, Any
 
 import numpy as np
@@ -165,6 +166,7 @@ def monkeypatch_retriever(retriever: DensePassageRetriever):
 
 
 def log_results(
+    output_directory: str,
     results: List[Any],
     dataset_name: str,
     steps: int,
@@ -206,7 +208,11 @@ def log_results(
                     if not metric_name in ["preds", "labels"] and not metric_name.startswith("_"):
                         logger.info("%s: %s", metric_name, metric_val)
 
+    # NOTE(Harsh): The next few lines is the reason for monkey patch.
+    breakpoint()
 
-def monkeypatch_result_logger():
-    Evaluator.log_results = staticmethod(log_results)
-    sys.modules["haystack.modeling.evaluation.eval"].Evaluator = Evaluator # to make it global across the process.
+
+def monkeypatch_result_logger(output_directory: str):
+    instantiated_log_results = partial(log_results, output_directory=output_directory)
+    Evaluator.log_results = staticmethod(instantiated_log_results)
+    # sys.modules["haystack.modeling.evaluation.eval"].Evaluator = Evaluator # to make it global across the process. Not needed.
