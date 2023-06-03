@@ -166,13 +166,13 @@ def monkeypatch_retriever(retriever: DensePassageRetriever):
 
 
 def log_results(
-    output_directory: str,
     results: List[Any],
     dataset_name: str,
     steps: int,
     logging: bool = True,
     print: bool = True,
     num_fold: Optional[int] = None,
+    output_directory: str = None,
 ):
     # Print a header
     header = "\n\n"
