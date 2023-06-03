@@ -73,8 +73,7 @@ def main():
 
         experiment_config = load_jsonnet(experiment_config_file_path)
         index_data_path = experiment_config.pop("index_data_path")
-        index_type = experiment_config.pop("index_type")
-        index_name = get_index_name(args.experiment_name, index_data_path, index_type)
+        index_name = get_index_name(args.experiment_name, index_data_path)
 
         # This needs to be passed in docker build command with --build-arg index_name=INDEX_NAME.
         image_name = get_image_name(index_name)

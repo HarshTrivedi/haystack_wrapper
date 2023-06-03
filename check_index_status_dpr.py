@@ -32,9 +32,9 @@ def main():
     print(json.dumps(collection_name_to_sizes, indent=4))
 
     index_data_path = experiment_config.pop("index_data_path")
+    index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
-    index_name = get_index_name(args.experiment_name, index_data_path, index_type)
     print(f"Index name: {index_name}")
     print(f"Index type: {index_type}")
 
