@@ -24,6 +24,7 @@ def main():
         "experiment_name", type=str,
         help="experiment_name (from config file in experiment_config/). Use haystack_help to see haystack args help."
     )
+    allennlp_parser.add_argument("--num_gpus", type=int, help="number of gpus.", default=4)
     allennlp_parser.add_argument("--force", action="store_true", default=False, help="force")
     allennlp_args = allennlp_parser.parse_args()
 
@@ -105,7 +106,7 @@ def main():
         num_positives=haystack_args.num_positives,
         n_epochs=haystack_args.n_epochs,
         evaluate_every=haystack_args.evaluate_every,
-        n_gpu=1,
+        n_gpu=allennlp_args.num_gpus,
         learning_rate=haystack_args.learning_rate,
         num_warmup_steps=haystack_args.num_warmup_steps,
         grad_acc_steps=haystack_args.grad_acc_steps,

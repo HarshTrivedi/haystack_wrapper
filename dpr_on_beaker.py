@@ -77,9 +77,7 @@ def main():
         choices=["general", "aristo", "allennlp", "mosaic", "s2", "safe_a1000s", "general-a100", "mosaic-rtx8k"],
         default="safe_a1000s"
     )
-    allennlp_base_parser.add_argument(
-        "--num_gpus", type=int, help="number of gpus.", default=None
-    )
+    allennlp_base_parser.add_argument("--num_gpus", type=int, help="number of gpus.", default=4)
     allennlp_base_parser.add_argument(
         "--copy_url", action="store_true", help="don't run, just copy beaker URL."
     )
@@ -105,9 +103,6 @@ def main():
         "--batch_size", type=int, help="batch_size", default=256 # no point increasing it, knn is bs=1
     )
     args = allennlp_root_parser.parse_args()
-
-    if args.num_gpus is None:
-        args.num_gpus = 4 if args.command == "index" else 1
 
     if not args.command:
         allennlp_root_parser.print_help()
@@ -172,7 +167,7 @@ def main():
     haystack_wrapper_root = experiment_config.get("haystack_wrapper_root", ".")
 
     if args.command == "train":
-        run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --force"
+        run_command = f"python {haystack_wrapper_root}/train_dpr.py {args.experiment_name} --num_gpus {args.num_gpus} --force"
     elif args.command == "index":
         run_command = f"python {haystack_wrapper_root}/index_dpr.py {args.experiment_name}"
         if args.delete_if_exists:
