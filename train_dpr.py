@@ -10,6 +10,7 @@ from dictparse import DictionaryParser
 from lib import is_directory_empty
 from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import InMemoryDocumentStore
+from haystack_monkeypatch import monkeypatch_result_logger
 
 
 logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level=logging.WARNING)
@@ -90,6 +91,7 @@ def main():
     checkpoint_dir = os.path.join(serialization_dir, "model_checkpoints")
     os.makedirs(checkpoint_dir, exist_ok=True)
 
+    monkeypatch_result_logger()
     retriever.train(
         data_dir=haystack_args.data_dir,
         train_filename=haystack_args.train_filename,
