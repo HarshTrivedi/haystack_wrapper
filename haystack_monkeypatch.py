@@ -215,7 +215,7 @@ def log_results(
     if output_directory is not None:
 
         # write in individual + latest metrics file
-        file_names = ["_".join([dataset_name.lower(), str(steps).zfill(6), ".json"]), "metrics.json"]
+        file_names = [f"{dataset_name.lower()}_{str(steps).zfill(6)}.json", "metrics.json"]
         for file_name in file_names:
             file_path = os.path.join(output_directory, file_name)
             write_json(results, file_path)
