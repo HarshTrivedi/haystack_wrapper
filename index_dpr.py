@@ -36,9 +36,9 @@ def main():
     embed_title = experiment_config.pop("embed_title", True)
     index_data_path = experiment_config.pop("index_data_path")
     index_num_chunks = experiment_config.pop("index_num_chunks", 1)
-    index_name = get_index_name(args.experiment_name, index_data_path)
     index_type = experiment_config.pop("index_type")
     assert index_type in ("FLAT", "IVF_FLAT", "HNSW")
+    index_name = get_index_name(args.experiment_name, index_data_path, index_type)
     print(f"Index name: {index_name}")
     print(f"Index type: {index_type}")
 

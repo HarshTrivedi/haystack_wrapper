@@ -1,18 +1,19 @@
 import os
 from typing import Dict
+from lib import hash_object
 
 
-def get_index_name(experiment_name: str, index_data_path: str) -> str:
+def get_index_name(experiment_name: str, index_data_path: str, index_type: str) -> str:
     index_data_path = index_data_path.replace( # TODO: Temporary hack to get natcq a good name. Fix later.
         "combined_cleaned_wikipedia_for_dpr", "processed_datasets/natcq/"
     )
     data_name = os.path.splitext(
         index_data_path
     )[0].replace("processed_datasets/", "").replace("processed_data/", "").replace("/", "__")
-    index_name = "___".join([experiment_name, data_name])
+    index_name = "___".join([experiment_name, data_name, index_type])
     if len(index_name) >= 100:
-        # without this I am not able to make insertions
-        index_name = index_name[-100:]
+        # without this I am not able to make insertions in milvus.
+        index_name = index_name[-94:] + "_" + hash_object(index_name)
     index_name = index_name.replace("-", "_") # only numbers, letters and underscores are allowed.
     return index_name
 
