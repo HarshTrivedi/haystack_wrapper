@@ -1,6 +1,7 @@
 # Monkey Patch to fix the progressbar in haystack prediction for farm-haystack[milvus]==v1.15.0
 
 from tqdm.auto import tqdm
+import os
 import sys
 import types
 import numbers
@@ -20,6 +21,8 @@ from haystack.nodes import DensePassageRetriever
 from haystack.modeling.visual import BUSH_SEP
 from haystack.modeling.evaluation.eval import Evaluator
 from haystack.utils.experiment_tracking import Tracker as tracker
+
+from lib import read_json, write_json
 
 
 logger = logging.getLogger(__name__)
@@ -209,7 +212,21 @@ def log_results(
                         logger.info("%s: %s", metric_name, metric_val)
 
     # NOTE(Harsh): The next few lines is the reason for monkey patch.
-    breakpoint()
+    if output_directory is not None:
+
+        # write in individual + latest metrics file
+        file_names = ["_".join([dataset_name.lower(), str(steps).zfill(6), ".json"]), "metrics.json"]
+        for file_name in file_names:
+            file_path = os.path.join(output_directory, file_name)
+            write_json(results, file_path)
+
+        # write in common file
+        file_path = os.path.join(output_directory, "all_metrics.json")
+        data = {}
+        if os.path.exists(file_path):
+            data = read_json(file_path)
+        data[steps] = results
+        write_json(data, file_path)
 
 
 def monkeypatch_result_logger(output_directory: str):
