@@ -113,11 +113,16 @@ def main():
             document["meta"]["id_prefix"] = true_document_id.replace(document["id"], "")
             assert true_document_id == document["meta"]["id_prefix"] + document["id"]
             metadata = {}
-            for key_name in ["id_prefix", "section_index", "document_type", "document_index", "document_sub_index"]:
+            field_names = ["id_prefix", "section_index", "document_type", "document_index", "document_sub_index"]
+            for key_name in field_names:
                 if key_name in document["meta"]:
                     metadata[key_name] = document["meta"][key_name]
             if embed_title:
-                metadata["name"] = document["meta"]["title"] # This is what it requires to embed_title
+                assert "title" in document["meta"] or "name" in document["meta"], \
+                    "The title/name must be set in meta if embed_title is True."
+                title = document["meta"].get("title", document["meta"].get("name", None))
+                metadata["name"] = title
+                assert title is not None
             document["meta"] = metadata
             documents.append(document)
 
