@@ -133,3 +133,11 @@ def get_milvus_address():
 def load_cwd_dotenv():
     env_path = os.path.join(os.getcwd(), ".env")
     load_dotenv(env_path)
+
+
+def string_to_hash(text_string: str) -> str:
+    import hashlib
+    hash_object = hashlib.sha256()
+    hash_object.update(text_string.encode("utf-8"))
+    hex_digest = hash_object.hexdigest()
+    return hex_digest

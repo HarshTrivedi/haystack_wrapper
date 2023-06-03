@@ -1,6 +1,6 @@
 import os
 from typing import Dict
-from lib import hash_object
+from lib import string_to_hash
 
 
 def get_index_name(experiment_name: str, index_data_path: str) -> str:
@@ -13,7 +13,7 @@ def get_index_name(experiment_name: str, index_data_path: str) -> str:
     index_name = "___".join([experiment_name, data_name])
     if len(index_name) >= 100:
         # without this I am not able to make insertions in milvus.
-        index_name = index_name[-94:] + "_" + hash_object(index_name)
+        index_name = index_name[-94:] + "_" + string_to_hash(index_name)
     index_name = index_name.replace("-", "_") # only numbers, letters and underscores are allowed.
     return index_name
 
