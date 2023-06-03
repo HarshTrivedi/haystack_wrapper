@@ -1,6 +1,7 @@
 # Monkey Patch to fix the progressbar in haystack prediction for farm-haystack[milvus]==v1.15.0
 
 from tqdm.auto import tqdm
+import sys
 import types
 import numbers
 import logging
@@ -208,3 +209,4 @@ def log_results(
 
 def monkeypatch_result_logger():
     Evaluator.log_results = staticmethod(log_results)
+    sys.modules["haystack.modeling.evaluation.eval"].Evaluator = Evaluator # to make it global across the process.
