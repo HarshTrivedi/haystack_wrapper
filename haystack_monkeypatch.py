@@ -16,7 +16,7 @@ from haystack.document_stores import BaseDocumentStore
 from haystack.modeling.data_handler.dataloader import NamedDataLoader
 from haystack.nodes import DensePassageRetriever
 from haystack.modeling.visual import BUSH_SEP
-from haystack.modeling.evaluation.eval import Evaluators
+from haystack.modeling.evaluation.eval import Evaluator
 from haystack.utils.experiment_tracking import Tracker as tracker
 
 
@@ -207,4 +207,4 @@ def log_results(
 
 
 def monkeypatch_result_logger():
-    Evaluators.log_results = staticmethod(log_results)
+    Evaluator.log_results = staticmethod(log_results)
