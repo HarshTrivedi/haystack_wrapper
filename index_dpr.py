@@ -8,7 +8,7 @@ from haystack.nodes import DensePassageRetriever
 
 from lib import yield_jsonl_slice, get_postgresql_address, get_milvus_address, load_cwd_dotenv
 from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
-from haystack_monkeypatch import monkeypath_retriever
+from haystack_monkeypatch import monkeypatch_retriever
 
 
 def main():
@@ -98,7 +98,7 @@ def main():
             max_seq_len_passage=440,
             batch_size=batch_size,
         )
-    monkeypath_retriever(retriever)
+    monkeypatch_retriever(retriever)
 
     for slice_index in range(index_num_chunks):
 

@@ -8,7 +8,7 @@ from haystack.nodes import DensePassageRetriever
 
 from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
 from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
-from haystack_monkeypatch import monkeypath_retriever
+from haystack_monkeypatch import monkeypatch_retriever
 
 
 def main():
@@ -104,7 +104,7 @@ def main():
             max_seq_len_passage=440,
         )
         retriever.progress_bar = True
-    monkeypath_retriever(retriever)
+    monkeypatch_retriever(retriever)
 
     prediction_instances = read_jsonl(args.prediction_file_path)
 

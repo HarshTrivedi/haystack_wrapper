@@ -2,6 +2,8 @@
 
 from tqdm.auto import tqdm
 import types
+import numbers
+import logging
 from typing import Optional, Dict, List, Union, Any
 
 import numpy as np
@@ -13,6 +15,12 @@ from haystack.errors import HaystackError
 from haystack.document_stores import BaseDocumentStore
 from haystack.modeling.data_handler.dataloader import NamedDataLoader
 from haystack.nodes import DensePassageRetriever
+from haystack.modeling.visual import BUSH_SEP
+from haystack.modeling.evaluation.eval import Evaluators
+from haystack.utils.experiment_tracking import Tracker as tracker
+
+
+logger = logging.getLogger(__name__)
 
 
 def query_by_embedding_batch(
@@ -150,6 +158,53 @@ def _get_predictions(self, dicts: List[Dict[str, Any]]) -> Dict[str, np.ndarray]
     return all_embeddings
 
 
-def monkeypath_retriever(retriever: DensePassageRetriever):
+def monkeypatch_retriever(retriever: DensePassageRetriever):
     retriever.retrieve_batch = types.MethodType(retrieve_batch, retriever)
     retriever._get_predictions = types.MethodType(_get_predictions, retriever)
+
+
+def log_results(
+    results: List[Any],
+    dataset_name: str,
+    steps: int,
+    logging: bool = True,
+    print: bool = True,
+    num_fold: Optional[int] = None,
+):
+    # Print a header
+    header = "\n\n"
+    header += BUSH_SEP + "\n"
+    header += "***************************************************\n"
+    if num_fold:
+        header += (
+            f"***** EVALUATION | FOLD: {num_fold} | {dataset_name.upper()} SET | AFTER {steps} BATCHES *****\n"
+        )
+    else:
+        header += f"***** EVALUATION | {dataset_name.upper()} SET | AFTER {steps} BATCHES *****\n"
+    header += "***************************************************\n"
+    header += BUSH_SEP + "\n"
+    logger.info(header)
+
+    for head in results:
+        logger.info("\n _________ %s _________", head["task_name"])
+        for metric_name, metric_val in head.items():
+            # log with experiment tracking framework (e.g. Mlflow)
+            if logging:
+                if not metric_name in ["preds", "labels"] and not metric_name.startswith("_"):
+                    if isinstance(metric_val, numbers.Number):
+                        tracker.track_metrics(
+                            metrics={f"{dataset_name}_{metric_name}_{head['task_name']}": metric_val}, step=steps
+                        )
+            # print via standard python logger
+            if print:
+                if metric_name == "report":
+                    if isinstance(metric_val, str) and len(metric_val) > 8000:
+                        metric_val = metric_val[:7500] + "\n ............................. \n" + metric_val[-500:]
+                    logger.info("%s: \n %s", metric_name, metric_val)
+                else:
+                    if not metric_name in ["preds", "labels"] and not metric_name.startswith("_"):
+                        logger.info("%s: %s", metric_name, metric_val)
+
+
+def monkeypatch_result_logger():
+    Evaluators.log_results = staticmethod(log_results)
