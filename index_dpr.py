@@ -33,6 +33,7 @@ def main():
     milvus_host, milvus_port = get_milvus_address()
     milvus_connect(milvus_host, milvus_port)
 
+    embed_title = experiment_config.pop("embed_title", True)
     index_data_path = experiment_config.pop("index_data_path")
     index_num_chunks = experiment_config.pop("index_num_chunks", 1)
     index_name = get_index_name(args.experiment_name, index_data_path)
@@ -115,6 +116,8 @@ def main():
             for key_name in ["id_prefix", "section_index", "document_type", "document_index", "document_sub_index"]:
                 if key_name in document["meta"]:
                     metadata[key_name] = document["meta"][key_name]
+            if embed_title:
+                metadata["name"] = document["meta"]["title"] # This is what it requires to embed_title
             document["meta"] = metadata
             documents.append(document)
 

@@ -130,6 +130,8 @@ def main():
                 "metadata": retrieved_document_["meta"],
                 "score": retrieved_document_["score"],
             }
+            if "name" in retrieved_document_["meta"]:
+                retrieved_document_stripped["title"] = retrieved_document_["meta"]["name"]
             retrieved_documents_stripped.append(retrieved_document_stripped)
         prediction_instance["retrieved_documents"] = retrieved_documents_stripped
 
