@@ -45,7 +45,7 @@ def main():
     haystack_parser.add_param("num_positives", type_=int, description="num_positives", default=1, required=False)
     haystack_parser.add_param("n_epochs", type_=int, description="n_epochs", required=True)
     haystack_parser.add_param("evaluate_every", type_=int, description="evaluate_every", required=True)
-    haystack_parser.add_param("learning_rate", type_=int, description="learning_rate", required=True)
+    haystack_parser.add_param("learning_rate", type_=float, description="learning_rate", required=True)
     haystack_parser.add_param("num_warmup_steps", type_=int, description="num_warmup_steps", required=True)
     haystack_parser.add_param("grad_acc_steps", type_=int, description="grad_acc_steps", required=True)
     haystack_parser.add_param("optimizer_name", type_=str, description="optimizer_name", default="AdamW", required=False)
