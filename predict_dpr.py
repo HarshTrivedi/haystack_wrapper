@@ -127,11 +127,12 @@ def main():
             retrieved_document_stripped = {
                 "id": id_,
                 "content": retrieved_document_["content"],
-                "metadata": retrieved_document_["meta"],
                 "score": retrieved_document_["score"],
             }
-            if "name" in retrieved_document_["meta"]:
-                retrieved_document_stripped["title"] = retrieved_document_["meta"]["name"]
+            for key, value in retrieved_document_["meta"].items():
+                retrieved_document_stripped[key] = value
+            if "name" in retrieved_document_stripped:
+                retrieved_document_stripped["title"] = retrieved_document_stripped.pop("name")
             retrieved_documents_stripped.append(retrieved_document_stripped)
         prediction_instance["retrieved_documents"] = retrieved_documents_stripped
 
