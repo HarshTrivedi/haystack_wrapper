@@ -71,6 +71,9 @@ def main():
     experiment_config.pop("predict_batch_size", None)
     haystack_args = haystack_parser.parse_dict(experiment_config)
 
+    if haystack_args.batch_size < 128 or haystack_args.grad_acc_steps > 1:
+        print("WARNING: The original DPR code used a batch size of 128 without grad accum (large BS is imp for in-batch negatives.)")
+
     retriever = DensePassageRetriever(
         document_store=InMemoryDocumentStore(), # NOTE: No need of using Milvus over here.
         query_embedding_model=haystack_args.query_model,
