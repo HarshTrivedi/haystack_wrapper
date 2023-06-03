@@ -19,6 +19,12 @@ def read_jsonl(file_path: str) -> List[Dict]:
     return instances
 
 
+def write_json(instance: Dict, file_path: str):
+    print(f"Writing an instance dict in {file_path}")
+    with open(file_path, "w") as file:
+        json.dump(instance, file, indent=4)
+
+
 def write_jsonl(instances: List[Dict], file_path: str):
     print(f"Writing {len(instances)} instances in {file_path}")
     with open(file_path, "w") as file:
