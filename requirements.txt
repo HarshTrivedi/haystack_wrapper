@@ -1,6 +1,6 @@
 dictparse
 jsonnet
-pymilvus
+pymilvus==2.2.8
 python-dotenv
 farm-haystack[milvus]==v1.15.0
 psycopg2-binary
