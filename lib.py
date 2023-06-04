@@ -2,8 +2,6 @@ import os
 import json
 import math
 from typing import Dict, List, Union, Any
-from tqdm import tqdm
-from dotenv import load_dotenv
 from functools import lru_cache
 
 
@@ -48,6 +46,7 @@ def yield_jsonl(file_path: str, size: int):
 
 @lru_cache(maxsize=None)
 def get_file_num_lines(file_path: str) -> int:
+    from tqdm import tqdm
     print(f"Counting num lines in {file_path}")
     with open(file_path) as file:
         number_of_lines = sum(1 for i in tqdm(file))
@@ -55,6 +54,7 @@ def get_file_num_lines(file_path: str) -> int:
 
 
 def yield_jsonl_slice(file_path: str, num_slices: int, slice_index: int) -> List[Dict]:
+    from tqdm import tqdm
     # This is to avoid the excess memory requirement of reading the whole file first
     # and then slicing it.
     assert 0 <= slice_index <= num_slices-1
@@ -131,6 +131,7 @@ def get_milvus_address():
 
 
 def load_cwd_dotenv():
+    from dotenv import load_dotenv
     env_path = os.path.join(os.getcwd(), ".env")
     load_dotenv(env_path)
 
