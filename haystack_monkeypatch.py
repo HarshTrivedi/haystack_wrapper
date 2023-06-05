@@ -7,6 +7,7 @@ import types
 import numbers
 import logging
 from functools import partial
+from pathlib import Path
 from typing import Optional, Dict, List, Union, Any
 
 import numpy as np
