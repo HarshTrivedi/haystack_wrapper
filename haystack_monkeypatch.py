@@ -19,6 +19,7 @@ from haystack.document_stores import BaseDocumentStore
 from haystack.modeling.data_handler.dataloader import NamedDataLoader
 from haystack.nodes import DensePassageRetriever
 from haystack.modeling.visual import BUSH_SEP
+from haystack.modeling.training.base import Trainer
 from haystack.modeling.evaluation.eval import Evaluator
 from haystack.utils.experiment_tracking import Tracker as tracker
 
@@ -233,3 +234,25 @@ def monkeypatch_result_logger(output_directory: str):
     instantiated_log_results = partial(log_results, output_directory=output_directory)
     Evaluator.log_results = staticmethod(instantiated_log_results)
     # sys.modules["haystack.modeling.evaluation.eval"].Evaluator = Evaluator # to make it global across the process. Not needed.
+
+
+@classmethod
+def _get_checkpoints(cls, checkpoint_root_dir: Path):
+    dirs = [d for d in checkpoint_root_dir.iterdir() if d.is_dir() and d.name.startswith("epoch")]
+
+    checkpoints_with_epoch_and_step = []  # list of tuple(checkpoint_dir, epoch, step)
+    for d in dirs:
+        # NOTE(Harsh): The one line is the reason for monkey patch: str(d) -> os.path.basename(str(d))
+        epoch, step = [int(s) for s in os.path.basename(str(d)).split("_") if s.isdigit()]
+        checkpoints_with_epoch_and_step.append((d, epoch, step))
+
+    sorted_checkpoints_with_epoch_and_step = sorted(
+        checkpoints_with_epoch_and_step, key=lambda tup: (tup[1], tup[2]), reverse=True  # sort by epoch and step
+    )
+    sorted_checkpoints = [tup[0] for tup in sorted_checkpoints_with_epoch_and_step]
+
+    return sorted_checkpoints
+
+
+def monekypatch_trainer():
+    Trainer._get_checkpoints = _get_checkpoints
