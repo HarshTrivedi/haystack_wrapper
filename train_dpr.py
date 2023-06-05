@@ -100,7 +100,7 @@ def main():
 
     metrics_dir = os.path.join(serialization_dir, "metrics")
     os.makedirs(metrics_dir, exist_ok=True)
-    monkeypatch_result_logger(metrics_dir)
+    monkeypatch_result_logger(serialization_dir)
     monekypatch_trainer()
     retriever.train(
         data_dir=haystack_args.data_dir,

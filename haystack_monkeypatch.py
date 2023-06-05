@@ -215,14 +215,18 @@ def log_results(
 
     # NOTE(Harsh): The next few lines is the reason for monkey patch.
     if output_directory is not None:
+        metrics_dir = os.path.join(output_directory, "metrics")
+        os.makedirs(metrics_dir, exist_ok=True)
 
-        # write in individual + latest metrics file
-        file_names = [f"{dataset_name.lower()}_{str(steps).zfill(6)}.json", "metrics.json"]
-        for file_name in file_names:
-            file_path = os.path.join(output_directory, file_name)
-            write_json(results, file_path)
+        # write individual metrics file
+        file_path = os.path.join(metrics_dir, f"{dataset_name.lower()}_{str(steps).zfill(6)}.json")
+        write_json(results, file_path)
 
-        # write in common file
+        # write latest metrics file
+        file_path = os.path.join(output_directory, "metrics.json") # for beaker UI
+        write_json(results, file_path)
+
+        # write all metrics so far in a single so it's easy to see the progress.
         file_path = os.path.join(output_directory, "all_metrics.json")
         data = {}
         if os.path.exists(file_path):
