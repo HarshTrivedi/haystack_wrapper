@@ -224,7 +224,7 @@ def log_results(
 
         # write latest metrics file
         file_path = os.path.join(output_directory, "metrics.json") # for beaker UI
-        write_json(results, file_path)
+        write_json(results[0], file_path)
 
         # write all metrics so far in a single so it's easy to see the progress.
         file_path = os.path.join(output_directory, "all_metrics.json")
