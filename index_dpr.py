@@ -91,7 +91,8 @@ def main():
         )
     else:
         retriever = DensePassageRetriever.load(
-            load_dir=serialization_dir,  document_store=None, # No need to pass document_store here, pass at retrieval time.
+            load_dir=serialization_dir,
+            document_store=None, # No need to pass document_store here, pass at retrieval time.
             query_encoder_dir="query_encoder",
             passage_encoder_dir="passage_encoder",
             max_seq_len_query=60,
