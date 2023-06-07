@@ -112,6 +112,11 @@ def get_beaker_configs() -> Dict:
     return beaker_configs
 
 
+def make_dirs_for_file_path(file_path: str):
+    dir_path = os.path.dirname(file_path)
+    os.makedirs(dir_path, exist_ok=True)
+
+
 def get_postgresql_address():
     postgresql_address = os.environ.get("POSTGRESQL_SERVER_ADDRESS", "localhost:5432")
     postgresql_address = postgresql_address.split("//")[1] if "//" in postgresql_address else postgresql_address
