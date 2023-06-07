@@ -6,9 +6,29 @@ import _jsonnet
 from dotenv import load_dotenv
 from haystack.nodes import DensePassageRetriever
 
-from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address
+from lib import read_jsonl, write_jsonl, get_postgresql_address, get_milvus_address, make_dirs_for_file_path
 from dpr_lib import get_index_name, milvus_connect, get_collection_name_to_sizes, build_document_store
 from haystack_monkeypatch import monkeypatch_retriever
+
+
+
+def get_prediction_output_file_path(
+    experiment_name: str,
+    index_data_path: str,
+    prediction_file_path: str,
+    num_documents: int,
+) -> str:
+    serialization_dir = os.path.join("serialization_dir", experiment_name)
+    index_name = get_index_name(experiment_name, index_data_path)
+    prediction_name = os.path.splitext(
+        prediction_file_path
+    )[0].replace("processed_data/", "").replace("/", "__") + f"__{num_documents}_docs"
+    retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
+    prediction_file_path = os.path.join(
+        retrieval_results_dir, "___".join([index_name, prediction_name]) + ".jsonl"
+    )
+    return prediction_file_path
+
 
 
 def main():
@@ -136,18 +156,13 @@ def main():
             retrieved_documents_stripped.append(retrieved_document_stripped)
         prediction_instance["retrieved_documents"] = retrieved_documents_stripped
 
-    prediction_name = os.path.splitext(
-        args.prediction_file_path
-    )[0].replace("processed_data/", "").replace("/", "__") + f"__{args.num_documents}_docs"
-    retrieval_results_dir = os.path.join(serialization_dir, "retrieval_results")
-
-    if args.output_directory:
-        retrieval_results_dir = args.output_directory
-
-    os.makedirs(retrieval_results_dir, exist_ok=True)
-    output_file_path = os.path.join(
-        retrieval_results_dir, "___".join([index_name, prediction_name]) + ".jsonl"
+    output_file_path = get_prediction_output_file_path(
+        args.experiment_name,
+        index_data_path,
+        args.prediction_file_path,
+        args.num_documents,
     )
+    make_dirs_for_file_path(output_file_path)
     write_jsonl(prediction_instances, output_file_path)
 
 
