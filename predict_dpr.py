@@ -163,7 +163,6 @@ def main():
         args.num_documents,
     )
     if args.output_directory:
-        os.makedirs(args.output_directory, exist_ok=True)
         output_file_path = os.path.join(args.output_directory, os.path.basename(output_file_path))
 
     make_dirs_for_file_path(output_file_path)
