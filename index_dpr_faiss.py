@@ -14,7 +14,7 @@ from haystack.nodes import DensePassageRetriever
 from haystack.document_stores import FAISSDocumentStore
 
 from lib import yield_jsonl_slice, load_cwd_dotenv
-from haystack_monkeypatch import monkeypath_retriever
+from haystack_monkeypatch import monkeypatch_retriever
 
 
 
@@ -142,7 +142,7 @@ def main():
             max_seq_len_passage=440,
             batch_size=batch_size,
         )
-    monkeypath_retriever(retriever)
+    monkeypatch_retriever(retriever)
 
     for slice_index in range(index_num_chunks):
 
