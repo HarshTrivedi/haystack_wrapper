@@ -28,7 +28,7 @@ def load_jsonnet(file_path: str):
     content = re.sub(r',\s*\n}', "\n}", content)
     try:
         instance = json.loads(content)
-    except JSONDecodeError:
+    except json.JSONDecodeError:
         print("Failed to parse the following json (tried to auto-fix it)")
         print(content)
     return instance
