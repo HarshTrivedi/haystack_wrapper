@@ -101,6 +101,8 @@ def main():
         )
     monkeypatch_retriever(retriever)
 
+    exit("Exiting successfully.")
+
     for slice_index in range(index_num_chunks):
 
         print(f"\n\nReading input documents slice {slice_index+1}/{index_num_chunks}.")
