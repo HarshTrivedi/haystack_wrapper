@@ -6,3 +6,4 @@ farm-haystack[milvus]==v1.15.0
 psycopg2-binary
 pyperclip
 progressbar2
+pydantic<=1.10.7
